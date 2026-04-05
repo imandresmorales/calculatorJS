@@ -209,3 +209,54 @@ body {
     box-shadow: 0 12px 30px rgba(236, 72, 153, 0.5);
     border-color: rgba(255, 255, 255, 0.5);
 }
+
+/* ======== Optimizaciones para Pantallas Móviles ======== */
+@media screen and (max-width: 420px) {
+    .calculator-container {
+        width: calc(100% - 30px);
+        padding: 25px 20px;
+        border-radius: 25px;
+        gap: 15px;
+    }
+
+    .display {
+        min-height: 100px;
+        padding: 5px;
+    }
+
+    .previous-operand {
+        font-size: 1.1rem;
+    }
+
+    .current-operand {
+        font-size: 3.2rem;
+    }
+
+    .buttons-grid {
+        gap: 12px;
+    }
+
+    .btn {
+        padding: 15px 0;
+        font-size: 1.3rem;
+        border-radius: 15px;
+    }
+    
+    .btn-action {
+        font-size: 1.1rem;
+    }
+}
+
+/* Ajustes para pantallas con poca altura */
+@media screen and (max-height: 700px) {
+    .calculator-container {
+        transform: scale(0.9);
+    }
+}
+
+@media screen and (max-height: 600px) {
+    .calculator-container {
+        transform: scale(0.75);
+    }
+}
+
