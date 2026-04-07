@@ -193,3 +193,38 @@ document.addEventListener('keydown', e => {
         calculator.updateDisplay();
     }
 });
+
+// Theme Toggle Logic
+const themeToggleBtn = document.getElementById('theme-toggle');
+const themeIconLight = document.getElementById('theme-icon-light');
+const themeIconDark = document.getElementById('theme-icon-dark');
+
+const savedTheme = localStorage.getItem('theme');
+const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+const setTheme = (isDark) => {
+    if (isDark) {
+        document.body.classList.remove('light-theme');
+        themeIconLight.style.display = 'block';
+        themeIconDark.style.display = 'none';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        document.body.classList.add('light-theme');
+        themeIconLight.style.display = 'none';
+        themeIconDark.style.display = 'block';
+        localStorage.setItem('theme', 'light');
+    }
+};
+
+if (savedTheme === 'light') {
+    setTheme(false);
+} else if (savedTheme === 'dark') {
+    setTheme(true);
+} else {
+    setTheme(prefersDark);
+}
+
+themeToggleBtn.addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('light-theme');
+    setTheme(!isDark);
+});
