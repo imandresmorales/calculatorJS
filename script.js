@@ -18,11 +18,19 @@ class Calculator {
     }
 
     appendNumber(number) {
+        if (number === '.' && this.currentOperand === '') this.currentOperand = '0';
         if (number === '.' && this.currentOperand.includes('.')) return;
+        
+        let valToAppend = number;
+        if (number === 'π') valToAppend = Math.PI.toString();
+        if (number === 'e') valToAppend = Math.E.toString();
+        
         if (this.currentOperand === '0' && number !== '.') {
-            this.currentOperand = number.toString();
+            this.currentOperand = valToAppend;
+        } else if (number === 'π' || number === 'e') {
+            this.currentOperand = valToAppend;
         } else {
-            this.currentOperand = this.currentOperand.toString() + number.toString();
+            this.currentOperand = this.currentOperand.toString() + valToAppend.toString();
         }
     }
 
@@ -41,6 +49,38 @@ class Calculator {
         this.operation = operation;
         this.previousOperand = this.currentOperand;
         this.currentOperand = '';
+    }
+
+    computeScientific(action) {
+        if (this.currentOperand === '') return;
+        const current = parseFloat(this.currentOperand);
+        if (isNaN(current)) return;
+        
+        let result;
+        switch (action) {
+            case 'sin': result = Math.sin(current); break;
+            case 'cos': result = Math.cos(current); break;
+            case 'tan': result = Math.tan(current); break;
+            case 'asin': result = Math.asin(current); break;
+            case 'acos': result = Math.acos(current); break;
+            case 'atan': result = Math.atan(current); break;
+            case 'log': result = Math.log10(current); break;
+            case 'ln': result = Math.log(current); break;
+            case 'exp': result = Math.exp(current); break;
+            case 'sqrt': result = Math.sqrt(current); break;
+            case 'inv': result = 1 / current; break;
+            case 'fact': 
+                if (current < 0) return; // Simplified: no negative factorials
+                let f = 1;
+                for (let i = 2; i <= Math.floor(current); i++) f *= i;
+                result = f;
+                break;
+            default: return;
+        }
+        
+        this.currentOperand = (Math.round(result * 100000000) / 100000000).toString();
+        this.operation = undefined;
+        this.previousOperand = '';
     }
 
     compute() {
@@ -70,6 +110,9 @@ class Calculator {
                 break;
             case '%':
                 computation = prev % current;
+                break;
+            case '^':
+                computation = Math.pow(prev, current);
                 break;
             default:
                 return;
@@ -137,6 +180,18 @@ numberButtons.forEach(button => {
 operationButtons.forEach(button => {
     button.addEventListener('click', () => {
         calculator.chooseOperation(button.dataset.operator);
+        calculator.updateDisplay();
+    });
+});
+
+const sciButtons = document.querySelectorAll('.btn-sci[data-action]');
+sciButtons.forEach(button => {
+    button.addEventListener('click', () => {
+        if (button.dataset.action === 'pow') {
+            calculator.chooseOperation('^');
+        } else {
+            calculator.computeScientific(button.dataset.action);
+        }
         calculator.updateDisplay();
     });
 });
@@ -228,3 +283,11 @@ themeToggleBtn.addEventListener('click', () => {
     const isDark = !document.body.classList.contains('light-theme');
     setTheme(!isDark);
 });
+
+// Mode Toggle Logic
+const modeToggleBtn = document.getElementById('mode-toggle');
+if (modeToggleBtn) {
+    modeToggleBtn.addEventListener('click', () => {
+        document.body.classList.toggle('scientific-mode');
+    });
+}
