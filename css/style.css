@@ -420,3 +420,14 @@ body.light-theme .btn-equals {
     visibility: visible;
     transform: translateX(-50%) translateY(10px);
 }
+
+/* Alineación específica para el botón derecho (evita salir de la pantalla) */
+#theme-toggle[data-tooltip]::after {
+    left: auto;
+    right: 0;
+    transform: translateX(0) translateY(0);
+}
+
+#theme-toggle[data-tooltip]:hover::after {
+    transform: translateX(0) translateY(10px);
+}
