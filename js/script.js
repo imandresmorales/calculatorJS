@@ -291,3 +291,60 @@ if (modeToggleBtn) {
         document.body.classList.toggle('scientific-mode');
     });
 }
+
+// Unit Converter Logic
+const unitToggleBtn = document.getElementById('unit-toggle');
+const unitControls = document.getElementById('unit-controls');
+const convertedOutput = document.getElementById('converted-output');
+const unitFrom = document.getElementById('unit-from');
+const unitTo = document.getElementById('unit-to');
+let isUnitMode = false;
+
+const lengthConversionRates = {
+    'm': 1,
+    'km': 1000,
+    'cm': 0.01,
+    'mm': 0.001,
+    'in': 0.0254,
+    'ft': 0.3048
+};
+
+function updateUnitConversion() {
+    if (!isUnitMode) return;
+    const val = parseFloat(calculator.currentOperand);
+    if (isNaN(val)) {
+        convertedOutput.innerText = '0 ' + unitTo.value;
+        return;
+    }
+    const inMeters = val * lengthConversionRates[unitFrom.value];
+    const converted = inMeters / lengthConversionRates[unitTo.value];
+    let result = Math.round(converted * 100000000) / 100000000;
+    convertedOutput.innerText = result + ' ' + unitTo.value;
+}
+
+const originalUpdateDisplay = calculator.updateDisplay.bind(calculator);
+calculator.updateDisplay = function() {
+    originalUpdateDisplay();
+    updateUnitConversion();
+}
+
+if (unitToggleBtn) {
+    unitToggleBtn.addEventListener('click', () => {
+        isUnitMode = !isUnitMode;
+        if (isUnitMode) {
+            unitControls.style.display = 'flex';
+            convertedOutput.style.display = 'block';
+            previousOperandTextElement.style.display = 'none';
+        } else {
+            unitControls.style.display = 'none';
+            convertedOutput.style.display = 'none';
+            previousOperandTextElement.style.display = 'block';
+        }
+        updateUnitConversion();
+    });
+}
+
+if (unitFrom && unitTo) {
+    unitFrom.addEventListener('change', updateUnitConversion);
+    unitTo.addEventListener('change', updateUnitConversion);
+}

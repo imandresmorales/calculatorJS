@@ -14,6 +14,16 @@
     </div>
     
     <div class="top-controls">
+        <button id="unit-toggle" class="mode-toggle" aria-label="Toggle unit mode" data-tooltip="Calculadora de Unidades (Longitud)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="6" width="20" height="12" rx="2" ry="2"/>
+                <line x1="6" y1="6" x2="6" y2="10"/>
+                <line x1="10" y1="6" x2="10" y2="10"/>
+                <line x1="14" y1="6" x2="14" y2="10"/>
+                <line x1="18" y1="6" x2="18" y2="10"/>
+            </svg>
+        </button>
+
         <button id="mode-toggle" class="mode-toggle" aria-label="Toggle mode" data-tooltip="Cambiar modo Científica / Estándar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
@@ -33,8 +43,28 @@
     
     <main class="calculator-container">
         <div class="display">
+            <div class="unit-controls" id="unit-controls" style="display: none;">
+                <select id="unit-from" class="unit-select">
+                    <option value="m">Metros</option>
+                    <option value="km">Kilómetros</option>
+                    <option value="cm">Centímetros</option>
+                    <option value="mm">Milímetros</option>
+                    <option value="in">Pulgadas</option>
+                    <option value="ft">Pies</option>
+                </select>
+                <span class="unit-arrow">→</span>
+                <select id="unit-to" class="unit-select">
+                    <option value="m">Metros</option>
+                    <option value="km">Kilómetros</option>
+                    <option value="cm" selected>Centímetros</option>
+                    <option value="mm">Milímetros</option>
+                    <option value="in">Pulgadas</option>
+                    <option value="ft">Pies</option>
+                </select>
+            </div>
             <div class="previous-operand" id="previous-operand"></div>
             <div class="current-operand" id="current-operand">0</div>
+            <div class="converted-output" id="converted-output" style="display: none;">0 cm</div>
         </div>
         <div class="grids-wrapper">
             <div class="scientific-grid" id="scientific-grid">
