@@ -18,6 +18,9 @@ class Calculator {
     }
 
     appendNumber(number) {
+        // Previene exceder el límite de dígitos seguros de JavaScript (aprox 15 dígitos)
+        if (this.currentOperand && this.currentOperand.toString().replace('.', '').length >= 15) return;
+
         if (number === '.' && this.currentOperand === '') this.currentOperand = '0';
         if (number === '.' && this.currentOperand.includes('.')) return;
         
