@@ -313,13 +313,15 @@ function updateUnitConversion() {
     if (!isUnitMode) return;
     const val = parseFloat(calculator.currentOperand);
     if (isNaN(val)) {
-        convertedOutput.innerText = '0 ' + unitTo.value;
+        convertedOutput.innerText = '0 ' + unitFrom.value + ' = 0 ' + unitTo.value;
         return;
     }
     const inMeters = val * lengthConversionRates[unitFrom.value];
     const converted = inMeters / lengthConversionRates[unitTo.value];
     let result = Math.round(converted * 100000000) / 100000000;
-    convertedOutput.innerText = result + ' ' + unitTo.value;
+    
+    // Mostramos la unidad original y la convertida para evitar confusi\u00f3n
+    convertedOutput.innerText = val + ' ' + unitFrom.value + ' = ' + result + ' ' + unitTo.value;
 }
 
 const originalUpdateDisplay = calculator.updateDisplay.bind(calculator);
