@@ -338,7 +338,7 @@ function updateUnitConversion() {
     if (!isUnitMode) return;
     const val = parseFloat(calculator.currentOperand);
     if (isNaN(val)) {
-        convertedOutput.innerText = '0 ' + unitFrom.value + ' = 0 ' + unitTo.value;
+        convertedOutput.innerText = '0 ' + unitTo.value;
         convertedOutput.style.fontSize = '';
         convertedOutput.style.transform = '';
         return;
@@ -347,8 +347,8 @@ function updateUnitConversion() {
     const converted = inMeters / lengthConversionRates[unitTo.value];
     let result = Math.round(converted * 100000000) / 100000000;
     
-    // Mostramos la unidad original y la convertida para evitar confusión
-    convertedOutput.innerText = val + ' ' + unitFrom.value + ' = ' + result + ' ' + unitTo.value;
+    // Mostramos solo la unidad convertida para ahorrar espacio
+    convertedOutput.innerText = result + ' ' + unitTo.value;
 
     calculator.fitText(convertedOutput);
 }
@@ -378,4 +378,14 @@ if (unitToggleBtn) {
 if (unitFrom && unitTo) {
     unitFrom.addEventListener('change', updateUnitConversion);
     unitTo.addEventListener('change', updateUnitConversion);
+}
+
+const swapUnitsBtn = document.getElementById('swap-units-btn');
+if (swapUnitsBtn) {
+    swapUnitsBtn.addEventListener('click', () => {
+        const temp = unitFrom.value;
+        unitFrom.value = unitTo.value;
+        unitTo.value = temp;
+        updateUnitConversion();
+    });
 }
