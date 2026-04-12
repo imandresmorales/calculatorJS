@@ -158,6 +158,28 @@ class Calculator {
         } else {
             this.previousOperandTextElement.innerText = '';
         }
+
+        this.fitText(this.currentOperandTextElement);
+        this.fitText(this.previousOperandTextElement);
+    }
+
+    fitText(element) {
+        if (!element || element.innerText === '') return;
+        
+        // Reset to default CSS font size
+        element.style.fontSize = '';
+        element.style.transform = '';
+        
+        const parent = element.parentElement;
+        if (!parent) return;
+        
+        const parentWidth = parent.clientWidth - 10; // minus padding
+        let fontSize = parseFloat(window.getComputedStyle(element).fontSize);
+        
+        while (element.scrollWidth > parentWidth && fontSize > 10) {
+            fontSize -= 1;
+            element.style.fontSize = fontSize + 'px';
+        }
     }
 }
 
@@ -317,14 +339,18 @@ function updateUnitConversion() {
     const val = parseFloat(calculator.currentOperand);
     if (isNaN(val)) {
         convertedOutput.innerText = '0 ' + unitFrom.value + ' = 0 ' + unitTo.value;
+        convertedOutput.style.fontSize = '';
+        convertedOutput.style.transform = '';
         return;
     }
     const inMeters = val * lengthConversionRates[unitFrom.value];
     const converted = inMeters / lengthConversionRates[unitTo.value];
     let result = Math.round(converted * 100000000) / 100000000;
     
-    // Mostramos la unidad original y la convertida para evitar confusi\u00f3n
+    // Mostramos la unidad original y la convertida para evitar confusión
     convertedOutput.innerText = val + ' ' + unitFrom.value + ' = ' + result + ' ' + unitTo.value;
+
+    calculator.fitText(convertedOutput);
 }
 
 const originalUpdateDisplay = calculator.updateDisplay.bind(calculator);
