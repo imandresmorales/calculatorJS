@@ -321,6 +321,7 @@ if (modeToggleBtn) {
 const unitToggleBtn = document.getElementById('unit-toggle');
 const unitControls = document.getElementById('unit-controls');
 const convertedOutput = document.getElementById('converted-output');
+const unitCategory = document.getElementById('unit-category');
 const unitFrom = document.getElementById('unit-from');
 const unitTo = document.getElementById('unit-to');
 let isUnitMode = false;
@@ -334,6 +335,50 @@ const lengthConversionRates = {
     'ft': 0.3048
 };
 
+const timeConversionRates = {
+    'seg': 1,
+    'min': 60,
+    'hr': 3600,
+    'dia': 86400,
+    'sem': 604800,
+    'año': 31536000
+};
+
+const lengthOptionsHTML = `
+    <option value="m">Metros</option>
+    <option value="km">Kilómetros</option>
+    <option value="cm">Centímetros</option>
+    <option value="mm">Milímetros</option>
+    <option value="in">Pulgadas</option>
+    <option value="ft">Pies</option>
+`;
+
+const timeOptionsHTML = `
+    <option value="seg">Segundos</option>
+    <option value="min">Minutos</option>
+    <option value="hr">Horas</option>
+    <option value="dia">Días</option>
+    <option value="sem">Semanas</option>
+    <option value="año">Años</option>
+`;
+
+if (unitCategory) {
+    unitCategory.addEventListener('change', () => {
+        if (unitCategory.value === 'length') {
+            unitFrom.innerHTML = lengthOptionsHTML;
+            unitTo.innerHTML = lengthOptionsHTML;
+            unitFrom.value = 'm';
+            unitTo.value = 'cm';
+        } else if (unitCategory.value === 'time') {
+            unitFrom.innerHTML = timeOptionsHTML;
+            unitTo.innerHTML = timeOptionsHTML;
+            unitFrom.value = 'hr';
+            unitTo.value = 'min';
+        }
+        updateUnitConversion();
+    });
+}
+
 function updateUnitConversion() {
     if (!isUnitMode) return;
     const val = parseFloat(calculator.currentOperand);
@@ -343,8 +388,11 @@ function updateUnitConversion() {
         convertedOutput.style.transform = '';
         return;
     }
-    const inMeters = val * lengthConversionRates[unitFrom.value];
-    const converted = inMeters / lengthConversionRates[unitTo.value];
+    
+    let rates = unitCategory && unitCategory.value === 'time' ? timeConversionRates : lengthConversionRates;
+    
+    const inBaseUnits = val * rates[unitFrom.value];
+    const converted = inBaseUnits / rates[unitTo.value];
     let result = Math.round(converted * 100000000) / 100000000;
     
     // Mostramos solo la unidad convertida para ahorrar espacio

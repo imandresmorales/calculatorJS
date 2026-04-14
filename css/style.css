@@ -449,10 +449,21 @@ body.light-theme .btn-equals {
 /* Unit Calculator additions */
 .unit-controls {
     display: flex;
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+}
+
+.unit-row {
+    display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
-    margin-bottom: 15px;
+}
+
+.unit-half {
+    width: 42%;
 }
 
 .unit-select {
