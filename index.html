@@ -14,6 +14,12 @@
     </div>
     
     <div class="top-controls">
+        <button id="graph-toggle" class="mode-toggle" aria-label="Toggle graph mode" data-tooltip="Calculadora Gráfica">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+            </svg>
+        </button>
+
         <button id="unit-toggle" class="mode-toggle" aria-label="Toggle unit mode" data-tooltip="Calculadora de Unidades">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="2" y="6" width="20" height="12" rx="2" ry="2"/>
@@ -45,8 +51,9 @@
         <div class="display">
             <div class="unit-controls" id="unit-controls" style="display: none;">
                 <select id="unit-category" class="unit-select" style="text-align: center;">
-                    <option value="length">Longitud</option>
-                    <option value="time">Tiempo</option>
+                    <option value="length">📏 Longitud</option>
+                    <option value="time">⏱ Tiempo</option>
+                    <option value="currency">💱 Monedas</option>
                 </select>
                 <div class="unit-row">
                     <select id="unit-from" class="unit-select unit-half">
@@ -66,6 +73,11 @@
                         <option value="in">Pulgadas</option>
                         <option value="ft">Pies</option>
                     </select>
+                </div>
+                <!-- Currency rate info bar -->
+                <div class="currency-info" id="currency-info" style="display:none;">
+                    <span id="currency-rate-label">Cargando tasas...</span>
+                    <span class="currency-refresh-btn" id="currency-refresh-btn" title="Actualizar tasas">↻</span>
                 </div>
             </div>
             <div class="previous-operand" id="previous-operand"></div>
@@ -121,6 +133,88 @@
         </div>
         </div>
     </main>
+
+    <!-- ===== GRAPHING CALCULATOR PANEL ===== -->
+    <div class="graph-panel" id="graph-panel">
+        <div class="graph-header">
+            <h2 class="graph-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                Calculadora Gráfica
+            </h2>
+            <button id="graph-close" class="graph-close-btn" title="Cerrar">✕</button>
+        </div>
+
+        <div class="graph-layout">
+            <!-- Left: Controls -->
+            <div class="graph-controls">
+                <div class="graph-functions-list" id="graph-functions-list">
+                    <!-- Function rows added by JS -->
+                </div>
+                <button class="graph-add-btn" id="graph-add-fn">+ Añadir función</button>
+
+                <div class="graph-section-title">Rango de Ejes</div>
+                <div class="graph-range-row">
+                    <div class="graph-range-group">
+                        <label>X mín</label>
+                        <input type="number" id="x-min" class="graph-input" value="-10">
+                    </div>
+                    <div class="graph-range-group">
+                        <label>X máx</label>
+                        <input type="number" id="x-max" class="graph-input" value="10">
+                    </div>
+                    <div class="graph-range-group">
+                        <label>Y mín</label>
+                        <input type="number" id="y-min" class="graph-input" value="-10">
+                    </div>
+                    <div class="graph-range-group">
+                        <label>Y máx</label>
+                        <input type="number" id="y-max" class="graph-input" value="10">
+                    </div>
+                </div>
+
+                <div class="graph-options-row">
+                    <label class="graph-checkbox-label">
+                        <input type="checkbox" id="graph-show-grid" checked> Cuadrícula
+                    </label>
+                    <label class="graph-checkbox-label">
+                        <input type="checkbox" id="graph-show-points"> Puntos clave
+                    </label>
+                    <label class="graph-checkbox-label">
+                        <input type="checkbox" id="graph-show-table"> Tabla de valores
+                    </label>
+                </div>
+
+                <button class="graph-plot-btn" id="graph-plot-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                    Graficar
+                </button>
+
+                <div class="graph-info-panel" id="graph-info-panel">
+                    <!-- Key points info shown here -->
+                </div>
+
+                <div class="graph-table-wrap" id="graph-table-wrap" style="display:none;">
+                    <div class="graph-section-title">Tabla de Valores</div>
+                    <div class="graph-table-scroll">
+                        <table class="graph-table" id="graph-table">
+                            <thead><tr><th>x</th><th>f(x)</th></tr></thead>
+                            <tbody id="graph-table-body"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Canvas -->
+            <div class="graph-canvas-wrap">
+                <canvas id="graph-canvas"></canvas>
+                <div class="graph-canvas-hint">Usa la rueda del ratón para hacer zoom · Arrastra para desplazarte</div>
+            </div>
+        </div>
+    </div>
+    <!-- Graph panel backdrop -->
+    <div class="graph-backdrop" id="graph-backdrop"></div>
+
     <script src="js/script.js"></script>
+    <script src="js/grapher.js"></script>
 </body>
 </html>

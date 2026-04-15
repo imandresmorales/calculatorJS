@@ -324,26 +324,49 @@ const convertedOutput = document.getElementById('converted-output');
 const unitCategory = document.getElementById('unit-category');
 const unitFrom = document.getElementById('unit-from');
 const unitTo = document.getElementById('unit-to');
+const currencyInfo = document.getElementById('currency-info');
+const currencyRateLabel = document.getElementById('currency-rate-label');
+const currencyRefreshBtn = document.getElementById('currency-refresh-btn');
 let isUnitMode = false;
 
+// ── Static conversion tables ───────────────────────────────────────────────
 const lengthConversionRates = {
-    'm': 1,
-    'km': 1000,
-    'cm': 0.01,
-    'mm': 0.001,
-    'in': 0.0254,
-    'ft': 0.3048
+    'm': 1, 'km': 1000, 'cm': 0.01, 'mm': 0.001, 'in': 0.0254, 'ft': 0.3048
 };
 
 const timeConversionRates = {
-    'seg': 1,
-    'min': 60,
-    'hr': 3600,
-    'dia': 86400,
-    'sem': 604800,
-    'año': 31536000
+    'seg': 1, 'min': 60, 'hr': 3600, 'dia': 86400, 'sem': 604800, 'año': 31536000
 };
 
+// ── Currency state ─────────────────────────────────────────────────────────
+let exchangeRates = {};          // rates relative to USD
+let ratesLastUpdated = null;
+let ratesLoading = false;
+
+const MAIN_CURRENCIES = [
+    { code: 'USD', name: 'Dólar estadounidense' },
+    { code: 'EUR', name: 'Euro' },
+    { code: 'MXN', name: 'Peso mexicano' },
+    { code: 'GBP', name: 'Libra esterlina' },
+    { code: 'JPY', name: 'Yen japonés' },
+    { code: 'CAD', name: 'Dólar canadiense' },
+    { code: 'AUD', name: 'Dólar australiano' },
+    { code: 'CHF', name: 'Franco suizo' },
+    { code: 'CNY', name: 'Yuan chino' },
+    { code: 'BRL', name: 'Real brasileño' },
+    { code: 'ARS', name: 'Peso argentino' },
+    { code: 'COP', name: 'Peso colombiano' },
+    { code: 'CLP', name: 'Peso chileno' },
+    { code: 'PEN', name: 'Sol peruano' },
+    { code: 'INR', name: 'Rupia india' },
+    { code: 'KRW', name: 'Won coreano' },
+];
+
+const currencyOptionsHTML = MAIN_CURRENCIES.map(c =>
+    `<option value="${c.code}">${c.code} – ${c.name}</option>`
+).join('');
+
+// ── HTML snippets for unit selects ─────────────────────────────────────────
 const lengthOptionsHTML = `
     <option value="m">Metros</option>
     <option value="km">Kilómetros</option>
@@ -362,42 +385,113 @@ const timeOptionsHTML = `
     <option value="año">Años</option>
 `;
 
+// ── Fetch exchange rates (open.er-api.com – free, no key needed) ───────────
+async function fetchExchangeRates() {
+    if (ratesLoading) return;
+    ratesLoading = true;
+    currencyRateLabel.textContent = '⏳ Actualizando tasas…';
+    currencyRefreshBtn.style.animation = 'spin 1s linear infinite';
+
+    try {
+        const res = await fetch('https://open.er-api.com/v6/latest/USD');
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+        if (data.result !== 'success') throw new Error('API error');
+
+        exchangeRates = data.rates;
+        ratesLastUpdated = new Date(data.time_last_update_utc);
+        showRateLabel();
+        updateUnitConversion();
+    } catch (err) {
+        currencyRateLabel.textContent = '⚠️ Sin conexión – tasas no disponibles';
+        console.warn('Currency API error:', err);
+    } finally {
+        ratesLoading = false;
+        currencyRefreshBtn.style.animation = '';
+    }
+}
+
+function showRateLabel() {
+    if (!ratesLastUpdated) return;
+    const from = unitFrom.value;
+    const to   = unitTo.value;
+    if (!exchangeRates[from] || !exchangeRates[to]) return;
+
+    // rate of 'from' relative to 'to'
+    const rateUSD_from = exchangeRates[from];
+    const rateUSD_to   = exchangeRates[to];
+    const rate = rateUSD_to / rateUSD_from;
+
+    const formatted = rate >= 0.01
+        ? rate.toLocaleString('es', { maximumFractionDigits: 4 })
+        : rate.toExponential(4);
+
+    currencyRateLabel.textContent = `1 ${from} = ${formatted} ${to}`;
+}
+
+// ── Category change ────────────────────────────────────────────────────────
 if (unitCategory) {
     unitCategory.addEventListener('change', () => {
-        if (unitCategory.value === 'length') {
+        const cat = unitCategory.value;
+        if (cat === 'length') {
             unitFrom.innerHTML = lengthOptionsHTML;
-            unitTo.innerHTML = lengthOptionsHTML;
+            unitTo.innerHTML   = lengthOptionsHTML;
             unitFrom.value = 'm';
-            unitTo.value = 'cm';
-        } else if (unitCategory.value === 'time') {
+            unitTo.value   = 'cm';
+            currencyInfo.style.display = 'none';
+        } else if (cat === 'time') {
             unitFrom.innerHTML = timeOptionsHTML;
-            unitTo.innerHTML = timeOptionsHTML;
+            unitTo.innerHTML   = timeOptionsHTML;
             unitFrom.value = 'hr';
-            unitTo.value = 'min';
+            unitTo.value   = 'min';
+            currencyInfo.style.display = 'none';
+        } else if (cat === 'currency') {
+            unitFrom.innerHTML = currencyOptionsHTML;
+            unitTo.innerHTML   = currencyOptionsHTML;
+            unitFrom.value = 'USD';
+            unitTo.value   = 'MXN';
+            currencyInfo.style.display = 'flex';
+            if (Object.keys(exchangeRates).length === 0) {
+                fetchExchangeRates();
+            } else {
+                showRateLabel();
+            }
         }
         updateUnitConversion();
     });
 }
 
+// ── Core conversion ────────────────────────────────────────────────────────
 function updateUnitConversion() {
     if (!isUnitMode) return;
     const val = parseFloat(calculator.currentOperand);
+    const cat = unitCategory ? unitCategory.value : 'length';
+
     if (isNaN(val)) {
-        convertedOutput.innerText = '0 ' + unitTo.value;
-        convertedOutput.style.fontSize = '';
-        convertedOutput.style.transform = '';
+        convertedOutput.innerText = '— ' + unitTo.value;
         return;
     }
-    
-    let rates = unitCategory && unitCategory.value === 'time' ? timeConversionRates : lengthConversionRates;
-    
-    const inBaseUnits = val * rates[unitFrom.value];
-    const converted = inBaseUnits / rates[unitTo.value];
-    let result = Math.round(converted * 100000000) / 100000000;
-    
-    // Mostramos solo la unidad convertida para ahorrar espacio
-    convertedOutput.innerText = result + ' ' + unitTo.value;
 
+    let result;
+
+    if (cat === 'currency') {
+        if (!exchangeRates[unitFrom.value] || !exchangeRates[unitTo.value]) {
+            convertedOutput.innerText = '…';
+            return;
+        }
+        // Both rates are relative to USD
+        const inUSD = val / exchangeRates[unitFrom.value];
+        result = inUSD * exchangeRates[unitTo.value];
+        // Update label too
+        showRateLabel();
+    } else {
+        const rates = cat === 'time' ? timeConversionRates : lengthConversionRates;
+        const inBase = val * rates[unitFrom.value];
+        result = inBase / rates[unitTo.value];
+    }
+
+    result = Math.round(result * 100000000) / 100000000;
+    convertedOutput.innerText = result.toLocaleString('es', { maximumFractionDigits: 8 }) + ' ' + unitTo.value;
     calculator.fitText(convertedOutput);
 }
 
@@ -405,7 +499,7 @@ const originalUpdateDisplay = calculator.updateDisplay.bind(calculator);
 calculator.updateDisplay = function() {
     originalUpdateDisplay();
     updateUnitConversion();
-}
+};
 
 if (unitToggleBtn) {
     unitToggleBtn.addEventListener('click', () => {
@@ -417,6 +511,7 @@ if (unitToggleBtn) {
         } else {
             unitControls.style.display = 'none';
             convertedOutput.style.display = 'none';
+            currencyInfo.style.display   = 'none';
             previousOperandTextElement.style.display = 'block';
         }
         updateUnitConversion();
@@ -424,8 +519,14 @@ if (unitToggleBtn) {
 }
 
 if (unitFrom && unitTo) {
-    unitFrom.addEventListener('change', updateUnitConversion);
-    unitTo.addEventListener('change', updateUnitConversion);
+    unitFrom.addEventListener('change', () => {
+        if (unitCategory && unitCategory.value === 'currency') showRateLabel();
+        updateUnitConversion();
+    });
+    unitTo.addEventListener('change', () => {
+        if (unitCategory && unitCategory.value === 'currency') showRateLabel();
+        updateUnitConversion();
+    });
 }
 
 const swapUnitsBtn = document.getElementById('swap-units-btn');
@@ -434,6 +535,35 @@ if (swapUnitsBtn) {
         const temp = unitFrom.value;
         unitFrom.value = unitTo.value;
         unitTo.value = temp;
+        if (unitCategory && unitCategory.value === 'currency') showRateLabel();
         updateUnitConversion();
     });
 }
+
+if (currencyRefreshBtn) {
+    currencyRefreshBtn.addEventListener('click', fetchExchangeRates);
+}
+
+// ── Graph toggle ───────────────────────────────────────────────────────────
+const graphToggleBtn = document.getElementById('graph-toggle');
+const graphPanel     = document.getElementById('graph-panel');
+const graphBackdrop  = document.getElementById('graph-backdrop');
+const graphCloseBtn  = document.getElementById('graph-close');
+
+function openGraphPanel() {
+    graphPanel.classList.add('open');
+    graphBackdrop.classList.add('visible');
+    document.body.style.overflow = 'hidden';
+    // Let grapher.js know it should (re)size the canvas
+    window.dispatchEvent(new Event('graph-panel-opened'));
+}
+
+function closeGraphPanel() {
+    graphPanel.classList.remove('open');
+    graphBackdrop.classList.remove('visible');
+    document.body.style.overflow = '';
+}
+
+if (graphToggleBtn) graphToggleBtn.addEventListener('click', openGraphPanel);
+if (graphCloseBtn)  graphCloseBtn.addEventListener('click',  closeGraphPanel);
+if (graphBackdrop)  graphBackdrop.addEventListener('click',  closeGraphPanel);
