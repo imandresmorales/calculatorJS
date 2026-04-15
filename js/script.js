@@ -183,6 +183,36 @@ class Calculator {
     }
 }
 
+// ── History event helpers ──────────────────────────────────────────────────
+/**
+ * Returns a human-readable expression string from the calculator state,
+ * or null if there is no complete binary expression pending.
+ */
+function buildHistoryExpression() {
+    const prev = calculator.previousOperand;
+    const op   = calculator.operation;
+    const cur  = calculator.currentOperand;
+    if (prev !== '' && op && cur !== '') {
+        return `${calculator.getDisplayNumber(prev)} ${op} ${calculator.getDisplayNumber(cur)}`;
+    }
+    return null;
+}
+
+/**
+ * Dispatches a `calc-result` CustomEvent consumed by history.js.
+ * Only strings are transmitted — no executable content.
+ * @param {string} expression
+ * @param {string} result
+ */
+function emitHistoryEvent(expression, result) {
+    window.dispatchEvent(new CustomEvent('calc-result', {
+        detail: {
+            expression: String(expression),
+            result:     String(result)
+        }
+    }));
+}
+
 // Selectors
 const numberButtons = document.querySelectorAll('[data-number]');
 const operationButtons = document.querySelectorAll('[data-operator]');
@@ -215,14 +245,23 @@ sciButtons.forEach(button => {
         if (button.dataset.action === 'pow') {
             calculator.chooseOperation('^');
         } else {
-            calculator.computeScientific(button.dataset.action);
+            const prevVal  = calculator.currentOperand;
+            const action   = button.dataset.action;
+            calculator.computeScientific(action);
+            const newVal   = calculator.currentOperand;
+            // Emit only when there was a real computation
+            if (newVal !== prevVal && !isNaN(parseFloat(newVal))) {
+                emitHistoryEvent(`${action}(${prevVal})`, newVal);
+            }
         }
         calculator.updateDisplay();
     });
 });
 
-equalsButton.addEventListener('click', button => {
+equalsButton.addEventListener('click', () => {
+    const expr = buildHistoryExpression();
     calculator.compute();
+    if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
     calculator.updateDisplay();
 });
 
@@ -244,7 +283,9 @@ document.addEventListener('keydown', e => {
     }
     if (e.key === '=' || e.key === 'Enter') {
         e.preventDefault();
+        const expr = buildHistoryExpression();
         calculator.compute();
+        if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
         calculator.updateDisplay();
     }
     if (e.key === 'Backspace') {

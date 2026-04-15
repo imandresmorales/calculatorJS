@@ -14,6 +14,13 @@
     </div>
     
     <div class="top-controls">
+        <button id="history-toggle" class="mode-toggle" aria-label="Historial de operaciones" data-tooltip="Historial">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+            </svg>
+        </button>
+
         <button id="graph-toggle" class="mode-toggle" aria-label="Toggle graph mode" data-tooltip="Calculadora Gráfica">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -134,6 +141,41 @@
         </div>
     </main>
 
+    <!-- ===== HISTORY PANEL ===== -->
+    <div class="history-panel" id="history-panel"
+         role="dialog" aria-modal="true"
+         aria-label="Historial de operaciones" aria-hidden="true">
+
+        <div class="history-header">
+            <h2 class="history-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+                </svg>
+                Historial
+            </h2>
+            <div class="history-header-actions">
+                <button id="history-export-btn" class="history-action-btn" title="Exportar historial como CSV">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                    CSV
+                </button>
+                <button id="history-clear-btn" class="history-action-btn history-action-danger" title="Limpiar todo el historial">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                    Limpiar
+                </button>
+                <button id="history-close-btn" class="graph-close-btn" title="Cerrar historial" aria-label="Cerrar historial">&#x2715;</button>
+            </div>
+        </div>
+
+        <div class="history-list" id="history-list" role="list" aria-live="polite">
+            <div class="history-empty" id="history-empty" aria-label="Sin entradas">
+                <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <p>No hay operaciones registradas.</p>
+                <p>Realiza un cálculo para verlo aquí.</p>
+            </div>
+        </div>
+    </div>
+    <div class="history-backdrop" id="history-backdrop"></div>
+
     <!-- ===== GRAPHING CALCULATOR PANEL ===== -->
     <div class="graph-panel" id="graph-panel">
         <div class="graph-header">
@@ -215,6 +257,7 @@
     <div class="graph-backdrop" id="graph-backdrop"></div>
 
     <script src="js/script.js"></script>
+    <script src="js/history.js"></script>
     <script src="js/grapher.js"></script>
 </body>
 </html>
