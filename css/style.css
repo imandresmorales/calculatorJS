@@ -1085,3 +1085,473 @@ body.light-theme .history-entry:hover { background: rgba(255,255,255,0.9); }
 @media screen and (max-width: 480px) {
     .history-panel { width: 100vw; }
 }
+
+/* ===================================================================
+   MATRIX CALCULATOR PANEL
+   =================================================================== */
+
+.matrix-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.55);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    z-index: 200;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+.matrix-backdrop.visible { opacity: 1; pointer-events: all; }
+
+/* Panel — full-screen, slides from bottom */
+.matrix-panel {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    display: flex;
+    flex-direction: column;
+    background: var(--calc-bg);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    transform: translateY(100%);
+    transition: transform 0.42s cubic-bezier(0.22, 1, 0.36, 1);
+    overflow: hidden;
+}
+.matrix-panel.open { transform: translateY(0); }
+
+/* Header */
+.matrix-pn-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 24px;
+    border-bottom: 1px solid var(--calc-border);
+    background: rgba(255,255,255,0.03);
+    flex-shrink: 0;
+}
+.matrix-pn-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.15rem;
+    font-weight: 600;
+    background: linear-gradient(135deg, #34d399, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Body */
+.matrix-pn-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    overflow: hidden;
+}
+
+/* -- Top row: A | Ops | B -- */
+.matrix-top-row {
+    display: flex;
+    gap: 16px;
+    padding: 16px 20px 10px;
+    flex-shrink: 0;
+    align-items: flex-start;
+    overflow-x: auto;
+}
+
+/* Matrix block (A and B) */
+.matrix-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--calc-border);
+    border-radius: 18px;
+    padding: 14px 16px;
+    min-width: 180px;
+    flex: 1;
+    max-width: 360px;
+}
+
+.matrix-block-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.matrix-label-name {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.matrix-label-name strong {
+    color: #34d399;
+    font-size: 1.05rem;
+}
+
+.matrix-dim-row {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.matrix-dim-sep { color: var(--text-muted); font-size: 0.85rem; }
+
+.matrix-dim-sel {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--calc-border);
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    padding: 3px 6px;
+    border-radius: 7px;
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.matrix-dim-sel:focus { border-color: rgba(52,211,153,0.5); }
+
+/* Matrix grid wrapper */
+.matrix-grid-wrap {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 4px 0;
+}
+.matrix-grid {
+    display: grid;
+    gap: 6px;
+}
+
+/* Individual cell input */
+.matrix-cell {
+    width: 52px;
+    height: 48px;
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.09);
+    border-radius: 9px;
+    color: var(--text-main);
+    font-family: 'Outfit', monospace, sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    outline: none;
+    transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+    -moz-appearance: textfield;
+}
+.matrix-cell::-webkit-inner-spin-button,
+.matrix-cell::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.matrix-cell:focus {
+    border-color: rgba(52, 211, 153, 0.6);
+    background: rgba(52, 211, 153, 0.08);
+    box-shadow: 0 0 0 2px rgba(52, 211, 153, 0.18);
+}
+
+/* Preset buttons (Rand / I / Zeros) */
+.matrix-preset-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.matrix-preset-btn {
+    flex: 1;
+    min-width: 50px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--calc-border);
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.75rem;
+    padding: 5px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+.matrix-preset-btn:hover {
+    background: rgba(52,211,153,0.12);
+    border-color: rgba(52,211,153,0.35);
+    color: #34d399;
+}
+
+/* -- Operations column -- */
+.matrix-ops-col {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--calc-border);
+    border-radius: 18px;
+    padding: 14px 12px;
+    min-width: 148px;
+    flex-shrink: 0;
+}
+
+.matrix-ops-title {
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-muted);
+    text-align: center;
+    margin-bottom: 2px;
+}
+
+.matrix-ops-list { display: flex; flex-direction: column; gap: 4px; }
+
+.mat-op-btn {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--calc-border);
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 7px 10px;
+    border-radius: 9px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.18s;
+    white-space: nowrap;
+}
+.mat-op-btn:hover {
+    background: rgba(52,211,153,0.1);
+    border-color: rgba(52,211,153,0.3);
+    color: #34d399;
+}
+.mat-op-btn.active {
+    background: rgba(52,211,153,0.18);
+    border-color: rgba(52,211,153,0.5);
+    color: #34d399;
+    font-weight: 600;
+}
+
+.mat-op-sep {
+    height: 1px;
+    background: var(--calc-border);
+    margin: 2px 0;
+}
+
+/* Extra inputs (k, n) */
+.mat-extra-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    padding: 4px 0;
+}
+.mat-extra-num {
+    width: 60px;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--calc-border);
+    color: var(--text-main);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 7px;
+    outline: none;
+    -moz-appearance: textfield;
+}
+.mat-extra-num:focus { border-color: rgba(52,211,153,0.5); }
+
+/* Swap button */
+.mat-swap-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--calc-border);
+    color: var(--text-muted);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.78rem;
+    padding: 6px 8px;
+    border-radius: 9px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.mat-swap-btn:hover {
+    background: rgba(59,130,246,0.12);
+    border-color: rgba(59,130,246,0.35);
+    color: #60a5fa;
+}
+
+/* Calculate button */
+.mat-calc-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    background: linear-gradient(135deg, rgba(52,211,153,0.2), rgba(59,130,246,0.2));
+    border: 1px solid rgba(52,211,153,0.4);
+    color: #34d399;
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    padding: 10px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.mat-calc-btn:hover {
+    background: linear-gradient(135deg, rgba(52,211,153,0.35), rgba(59,130,246,0.35));
+    border-color: rgba(52,211,153,0.7);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52,211,153,0.25);
+}
+.mat-calc-btn:active { transform: translateY(0); }
+
+/* -- Bottom row: Result + Steps -- */
+.matrix-bottom-row {
+    display: flex;
+    flex: 1;
+    gap: 16px;
+    padding: 10px 20px 16px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.matrix-result-panel,
+.matrix-steps-panel {
+    display: flex;
+    flex-direction: column;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid var(--calc-border);
+    border-radius: 16px;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.matrix-result-panel { flex: 1.4; }
+.matrix-steps-panel  { flex: 1; }
+
+.matrix-result-head,
+.matrix-steps-head {
+    padding: 10px 16px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--calc-border);
+    background: rgba(255,255,255,0.02);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+}
+
+.mat-result-body,
+.mat-steps-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    align-items: flex-start;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.mat-result-body  { align-items: center; justify-content: center; }
+.mat-steps-body   { flex-direction: column; gap: 2px; }
+
+/* Empty hint */
+.mat-empty-hint {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    text-align: center;
+    opacity: 0.6;
+}
+.mat-empty-hint em { color: #34d399; font-style: normal; }
+
+/* Error message */
+.mat-error-msg {
+    color: #fb7185;
+    font-size: 0.88rem;
+    text-align: center;
+    background: rgba(251,113,133,0.08);
+    border: 1px solid rgba(251,113,133,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    max-width: 320px;
+}
+
+/* -- Result matrix with brackets -- */
+.mat-result-wrap {
+    display: inline-flex;
+    align-items: stretch;
+    gap: 6px;
+    animation: fadeIn 0.25s ease forwards;
+}
+.mat-bracket {
+    width: 9px;
+    border: 2px solid rgba(52,211,153,0.6);
+    border-radius: 3px;
+}
+.mat-bracket-l { border-right: none; border-radius: 4px 0 0 4px; }
+.mat-bracket-r { border-left:  none; border-radius: 0 4px 4px 0; }
+
+.mat-result-grid {
+    display: grid;
+    gap: 6px 14px;
+    padding: 8px 4px;
+}
+.mat-result-cell {
+    text-align: right;
+    font-size: 1.05rem;
+    font-weight: 600;
+    font-family: 'Outfit', monospace, sans-serif;
+    color: var(--text-main);
+    min-width: 44px;
+    white-space: nowrap;
+}
+
+.mat-result-info {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    opacity: 0.5;
+    text-align: center;
+    margin-top: 8px;
+}
+
+/* Scalar result (det, rank) */
+.mat-scalar-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    animation: fadeIn 0.25s ease forwards;
+}
+.mat-scalar-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+.mat-scalar-value {
+    font-size: 3rem;
+    font-weight: 300;
+    letter-spacing: -2px;
+    background: linear-gradient(135deg, #34d399, #3b82f6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Steps */
+.mat-step-line {
+    font-size: 0.82rem;
+    font-family: 'Outfit', monospace, sans-serif;
+    color: var(--text-muted);
+    line-height: 1.6;
+    white-space: pre;
+}
+.mat-step-gap { height: 6px; }
+
+/* Light theme */
+body.light-theme .matrix-block,
+body.light-theme .matrix-ops-col,
+body.light-theme .matrix-result-panel,
+body.light-theme .matrix-steps-panel {
+    background: rgba(255,255,255,0.7);
+}
+
+/* Mobile */
+@media screen and (max-width: 768px) {
+    .matrix-top-row    { flex-direction: column; }
+    .matrix-bottom-row { flex-direction: column; }
+    .matrix-block      { max-width: 100%; }
+    .matrix-cell       { width: 44px; height: 42px; font-size: 0.9rem; }
+}

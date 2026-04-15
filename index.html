@@ -21,6 +21,13 @@
             </svg>
         </button>
 
+        <button id="matrix-toggle" class="mode-toggle" aria-label="Calculadora de Matrices" data-tooltip="Calculadora de Matrices">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
+                <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+        </button>
+
         <button id="graph-toggle" class="mode-toggle" aria-label="Toggle graph mode" data-tooltip="Calculadora Gráfica">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -141,6 +148,113 @@
         </div>
     </main>
 
+    <!-- ===== MATRIX CALCULATOR PANEL ===== -->
+    <div class="matrix-panel" id="matrix-panel"
+         role="dialog" aria-modal="true"
+         aria-label="Calculadora de Matrices" aria-hidden="true">
+
+        <div class="matrix-pn-header">
+            <h2 class="matrix-pn-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                Calculadora de Matrices
+            </h2>
+            <button id="matrix-close" class="graph-close-btn" title="Cerrar" aria-label="Cerrar calculadora de matrices">&#x2715;</button>
+        </div>
+
+        <div class="matrix-pn-body">
+            <!-- Top row: A | ops | B -->
+            <div class="matrix-top-row">
+
+                <!-- Matrix A -->
+                <div class="matrix-block" id="mat-block-a">
+                    <div class="matrix-block-head">
+                        <span class="matrix-label-name">Matriz <strong>A</strong></span>
+                        <div class="matrix-dim-row">
+                            <select id="mat-a-rows" class="matrix-dim-sel" aria-label="Filas de A"></select>
+                            <span class="matrix-dim-sep">×</span>
+                            <select id="mat-a-cols" class="matrix-dim-sel" aria-label="Columnas de A"></select>
+                        </div>
+                    </div>
+                    <div class="matrix-grid-wrap"><div class="matrix-grid" id="mat-a-grid"></div></div>
+                    <div class="matrix-preset-row">
+                        <button class="matrix-preset-btn" id="mat-a-rand" title="Números aleatorios">&#8635; Rand</button>
+                        <button class="matrix-preset-btn" id="mat-a-iden" title="Matriz identidad">I</button>
+                        <button class="matrix-preset-btn" id="mat-a-zero" title="Rellenar con ceros">⦸</button>
+                    </div>
+                </div>
+
+                <!-- Operations column -->
+                <div class="matrix-ops-col">
+                    <div class="matrix-ops-title">Operación</div>
+                    <div class="matrix-ops-list" role="group" aria-label="Operaciones matriciales">
+                        <button class="mat-op-btn active" data-op="add">A + B</button>
+                        <button class="mat-op-btn" data-op="sub">A − B</button>
+                        <button class="mat-op-btn" data-op="mul">A × B</button>
+                        <div class="mat-op-sep"></div>
+                        <button class="mat-op-btn" data-op="scalar">k · A</button>
+                        <button class="mat-op-btn" data-op="transpose">Aᵀ</button>
+                        <button class="mat-op-btn" data-op="det">det(A)</button>
+                        <button class="mat-op-btn" data-op="inv">A⁻¹</button>
+                        <button class="mat-op-btn" data-op="rank">rk(A)</button>
+                        <button class="mat-op-btn" data-op="power">Aⁿ</button>
+                    </div>
+                    <div class="mat-extra-row" id="mat-scalar-row" style="display:none;">
+                        <label for="mat-scalar-input">k =</label>
+                        <input type="number" id="mat-scalar-input" class="mat-extra-num" value="2" step="any">
+                    </div>
+                    <div class="mat-extra-row" id="mat-power-row" style="display:none;">
+                        <label for="mat-power-input">n =</label>
+                        <input type="number" id="mat-power-input" class="mat-extra-num" value="2" min="0" max="20" step="1">
+                    </div>
+                    <button class="mat-swap-btn" id="mat-swap-btn" title="Intercambiar A ⇔ B">⇄ A⇔B</button>
+                    <button class="mat-calc-btn" id="mat-calc-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                        Calcular
+                    </button>
+                </div>
+
+                <!-- Matrix B -->
+                <div class="matrix-block" id="mat-block-b">
+                    <div class="matrix-block-head">
+                        <span class="matrix-label-name">Matriz <strong>B</strong></span>
+                        <div class="matrix-dim-row">
+                            <select id="mat-b-rows" class="matrix-dim-sel" aria-label="Filas de B"></select>
+                            <span class="matrix-dim-sep">×</span>
+                            <select id="mat-b-cols" class="matrix-dim-sel" aria-label="Columnas de B"></select>
+                        </div>
+                    </div>
+                    <div class="matrix-grid-wrap"><div class="matrix-grid" id="mat-b-grid"></div></div>
+                    <div class="matrix-preset-row">
+                        <button class="matrix-preset-btn" id="mat-b-rand" title="Números aleatorios">&#8635; Rand</button>
+                        <button class="matrix-preset-btn" id="mat-b-iden" title="Matriz identidad">I</button>
+                        <button class="matrix-preset-btn" id="mat-b-zero" title="Rellenar con ceros">⦸</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bottom row: Result + Steps -->
+            <div class="matrix-bottom-row">
+                <div class="matrix-result-panel">
+                    <div class="matrix-result-head">
+                        <span>Resultado</span>
+                        <button id="mat-copy-btn" class="history-action-btn" title="Copiar como texto tabular">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                            Copiar
+                        </button>
+                    </div>
+                    <div id="mat-result" class="mat-result-body">
+                        <div class="mat-empty-hint">Selecciona una operación y pulsa <em>Calcular</em></div>
+                    </div>
+                </div>
+                <div class="matrix-steps-panel">
+                    <div class="matrix-steps-head">Procedimiento</div>
+                    <div id="mat-steps" class="mat-steps-body"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="matrix-backdrop" id="matrix-backdrop"></div>
+
     <!-- ===== HISTORY PANEL ===== -->
     <div class="history-panel" id="history-panel"
          role="dialog" aria-modal="true"
@@ -257,6 +371,7 @@
     <div class="graph-backdrop" id="graph-backdrop"></div>
 
     <script src="js/script.js"></script>
+    <script src="js/matrices.js"></script>
     <script src="js/history.js"></script>
     <script src="js/grapher.js"></script>
 </body>
