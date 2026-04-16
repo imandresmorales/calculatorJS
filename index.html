@@ -28,6 +28,12 @@
             </svg>
         </button>
 
+        <button id="prog-toggle" class="mode-toggle" aria-label="Modo Programador" data-tooltip="Modo Programador">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+            </svg>
+        </button>
+
         <button id="graph-toggle" class="mode-toggle" aria-label="Toggle graph mode" data-tooltip="Calculadora Gráfica">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -370,9 +376,119 @@
     <!-- Graph panel backdrop -->
     <div class="graph-backdrop" id="graph-backdrop"></div>
 
+    <!-- ===== PROGRAMMER MODE PANEL ===== -->
+    <div class="prog-panel" id="prog-panel"
+         role="dialog" aria-modal="true"
+         aria-label="Modo Programador" aria-hidden="true">
+
+        <div class="prog-header">
+            <h2 class="prog-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                Modo Programador
+            </h2>
+            <button id="prog-close" class="graph-close-btn" title="Cerrar" aria-label="Cerrar modo programador">&#x2715;</button>
+        </div>
+
+        <div class="prog-body">
+
+            <!-- Base selector -->
+            <div class="prog-base-row" role="group" aria-label="Seleccionar base numérica">
+                <button class="prog-base-btn" data-base="16">HEX</button>
+                <button class="prog-base-btn" data-base="10" aria-pressed="true">DEC</button>
+                <button class="prog-base-btn" data-base="8">OCT</button>
+                <button class="prog-base-btn" data-base="2">BIN</button>
+            </div>
+
+            <!-- Main display -->
+            <div class="prog-display-wrap">
+                <div class="prog-expr" id="prog-expr"></div>
+                <div class="prog-display" id="prog-display">0</div>
+            </div>
+
+            <!-- Cross-base views -->
+            <div class="prog-views">
+                <div class="prog-view-row">
+                    <span class="prog-view-label">HEX</span>
+                    <span class="prog-view-value" id="prog-hex-view">0x0</span>
+                </div>
+                <div class="prog-view-row">
+                    <span class="prog-view-label">DEC</span>
+                    <span class="prog-view-value" id="prog-dec-view">0</span>
+                </div>
+                <div class="prog-view-row">
+                    <span class="prog-view-label">OCT</span>
+                    <span class="prog-view-value" id="prog-oct-view">0o0</span>
+                </div>
+                <div class="prog-view-row">
+                    <span class="prog-view-label">BIN</span>
+                    <span class="prog-view-value prog-view-bin" id="prog-bin-view">0000 0000</span>
+                </div>
+            </div>
+
+            <!-- 32-bit grid -->
+            <div class="prog-bit-section">
+                <div class="prog-bit-label">
+                    <span>Bit 31</span><span>Bit 0</span>
+                </div>
+                <div class="prog-bit-grid" id="prog-bit-grid"></div>
+                <div class="prog-bit-groups">
+                    <span>31…24</span><span>23…16</span><span>15…8</span><span>7…0</span>
+                </div>
+            </div>
+
+            <!-- Operation pad -->
+            <div class="prog-pad">
+                <!-- Row 0: Clear / DEL / NEG / NOT -->
+                <button class="prog-pad-fn" data-prog-action="clear">AC</button>
+                <button class="prog-pad-fn" data-prog-action="delete">DEL</button>
+                <button class="prog-pad-fn" data-prog-action="negate">+/−</button>
+                <button class="prog-pad-op" data-prog-action="NOT">NOT</button>
+
+                <!-- Row 1: HEX digits A-D + AND / OR -->
+                <button class="prog-pad-hex" data-prog-digit="A">A</button>
+                <button class="prog-pad-hex" data-prog-digit="B">B</button>
+                <button class="prog-pad-hex" data-prog-digit="C">C</button>
+                <button class="prog-pad-op" data-prog-action="AND">AND</button>
+
+                <!-- Row 2: HEX digits D-F + ROR / OR -->
+                <button class="prog-pad-hex" data-prog-digit="D">D</button>
+                <button class="prog-pad-hex" data-prog-digit="E">E</button>
+                <button class="prog-pad-hex" data-prog-digit="F">F</button>
+                <button class="prog-pad-op" data-prog-action="OR">OR</button>
+
+                <!-- Row 3: 7 8 9 XOR -->
+                <button class="prog-pad-num" data-prog-digit="7">7</button>
+                <button class="prog-pad-num" data-prog-digit="8">8</button>
+                <button class="prog-pad-num" data-prog-digit="9">9</button>
+                <button class="prog-pad-op" data-prog-action="XOR">XOR</button>
+
+                <!-- Row 4: 4 5 6 << -->
+                <button class="prog-pad-num" data-prog-digit="4">4</button>
+                <button class="prog-pad-num" data-prog-digit="5">5</button>
+                <button class="prog-pad-num" data-prog-digit="6">6</button>
+                <button class="prog-pad-op" data-prog-action="&lt;&lt;">&lt;&lt;</button>
+
+                <!-- Row 5: 1 2 3 >> -->
+                <button class="prog-pad-num" data-prog-digit="1">1</button>
+                <button class="prog-pad-num" data-prog-digit="2">2</button>
+                <button class="prog-pad-num" data-prog-digit="3">3</button>
+                <button class="prog-pad-op" data-prog-action="&gt;&gt;">&gt;&gt;</button>
+
+                <!-- Row 6: ROL 0 ROR = -->
+                <button class="prog-pad-op" data-prog-action="ROL">ROL</button>
+                <button class="prog-pad-num" data-prog-digit="0">0</button>
+                <button class="prog-pad-op" data-prog-action="ROR">ROR</button>
+                <button class="prog-pad-eq" data-prog-action="equals">=</button>
+            </div>
+
+        </div>
+    </div>
+    <div class="prog-backdrop" id="prog-backdrop"></div>
+
     <script src="js/script.js"></script>
     <script src="js/matrices.js"></script>
     <script src="js/history.js"></script>
     <script src="js/grapher.js"></script>
+    <script src="js/programmer.js"></script>
 </body>
 </html>
