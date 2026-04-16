@@ -6,6 +6,94 @@
     <title>Calculadora Premium</title>
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+    /* ── Fix body overflow breaking position:fixed ── */
+    body { overflow-x: visible; }
+    html { overflow-x: hidden; }
+
+    /* ── PROGRAMMER PANEL ── */
+    .prog-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(6px); z-index:299; opacity:0; transition:opacity .3s ease; }
+    .prog-backdrop.visible { display:block; opacity:1; }
+    .prog-panel { position:fixed; top:0; right:0; bottom:0; left:auto; width:min(520px,100vw); height:100vh; background:rgba(18,18,35,.97); backdrop-filter:blur(20px); border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 40px rgba(0,0,0,.5); z-index:300; display:flex; flex-direction:column; overflow:hidden; transform:translateX(100%); transition:transform .35s cubic-bezier(.4,0,.2,1); box-sizing:border-box; }
+    .prog-panel.open { transform:translateX(0); }
+    .prog-header { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem .75rem; border-bottom:1px solid rgba(255,255,255,.07); flex-shrink:0; }
+    .prog-title { display:flex; align-items:center; gap:.55rem; font-size:1rem; font-weight:600; color:#e2e8f0; margin:0; }
+    .prog-title svg { color:#a78bfa; }
+    .prog-body { display:flex; flex-direction:column; gap:.85rem; padding:1rem 1.1rem; overflow-y:auto; flex:1; }
+    .prog-base-row { display:flex; gap:.5rem; }
+    .prog-base-btn { flex:1; padding:.45rem .25rem; border-radius:8px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.05); color:#94a3b8; font-family:'Outfit',monospace; font-size:.8rem; font-weight:600; letter-spacing:.05em; cursor:pointer; transition:all .2s ease; }
+    .prog-base-btn:hover { background:rgba(167,139,250,.15); border-color:rgba(167,139,250,.35); color:#a78bfa; }
+    .prog-base-btn.active { background:rgba(167,139,250,.22); border-color:rgba(167,139,250,.6); color:#a78bfa; box-shadow:0 0 12px rgba(167,139,250,.2); }
+    .prog-display-wrap { background:rgba(0,0,0,.3); border:1px solid rgba(255,255,255,.07); border-radius:12px; padding:.75rem 1rem; min-height:72px; display:flex; flex-direction:column; align-items:flex-end; gap:.2rem; }
+    .prog-expr { font-size:.8rem; color:#94a3b8; min-height:1rem; font-family:monospace; }
+    .prog-display { font-size:2.25rem; font-weight:400; font-family:'Courier New',monospace; color:#e2e8f0; letter-spacing:.05em; word-break:break-all; text-align:right; }
+    .prog-views { background:rgba(0,0,0,.2); border:1px solid rgba(255,255,255,.06); border-radius:10px; overflow:hidden; }
+    .prog-view-row { display:flex; align-items:center; justify-content:space-between; padding:.42rem .9rem; border-bottom:1px solid rgba(255,255,255,.04); }
+    .prog-view-row:last-child { border-bottom:none; }
+    .prog-view-label { font-size:.72rem; font-weight:700; letter-spacing:.1em; color:#a78bfa; width:36px; flex-shrink:0; }
+    .prog-view-value { font-family:'Courier New',monospace; font-size:.82rem; color:#e2e8f0; text-align:right; word-break:break-all; }
+    .prog-view-bin { font-size:.75rem; color:#7dd3fc; }
+    .prog-bit-section { display:flex; flex-direction:column; gap:.35rem; }
+    .prog-bit-label { display:flex; justify-content:space-between; font-size:.65rem; color:#64748b; padding:0 2px; }
+    .prog-bit-grid { display:grid; grid-template-columns:repeat(32,1fr); gap:2px; }
+    .prog-bit-cell { aspect-ratio:1; min-width:0; border:none; border-radius:3px; font-size:.5rem; font-family:monospace; cursor:pointer; padding:0; }
+    .prog-bit-zero { background:rgba(255,255,255,.06); color:rgba(255,255,255,.2); }
+    .prog-bit-one { background:rgba(167,139,250,.5); color:#e2e8f0; }
+    .prog-bit-cell:hover { background:rgba(167,139,250,.35) !important; color:white !important; }
+    .prog-bit-sign { border:1px solid rgba(251,113,133,.5) !important; }
+    .prog-bit-sign.prog-bit-one { background:rgba(251,113,133,.55) !important; }
+    .prog-bit-groups { display:grid; grid-template-columns:repeat(4,1fr); font-size:.6rem; color:rgba(255,255,255,.2); text-align:center; }
+    .prog-pad { display:grid; grid-template-columns:repeat(4,1fr); gap:.45rem; }
+    .prog-pad button { padding:.65rem .25rem; border-radius:9px; border:1px solid rgba(255,255,255,.07); font-family:'Outfit',monospace; font-size:.9rem; font-weight:500; cursor:pointer; min-height:48px; }
+    .prog-pad-num { background:rgba(255,255,255,.07); color:#e2e8f0; }
+    .prog-pad-hex { background:rgba(125,211,252,.1); color:#7dd3fc; font-weight:700; }
+    .prog-pad-op { background:rgba(167,139,250,.1); color:#a78bfa; font-size:.78rem; font-weight:700; }
+    .prog-pad-fn { background:rgba(251,191,36,.08); color:#fbbf24; font-weight:600; }
+    .prog-pad-eq { background:linear-gradient(135deg,#7c3aed,#a78bfa); color:white; border:none; font-weight:700; font-size:1.1rem; }
+    .prog-pad button:disabled { opacity:.25 !important; cursor:not-allowed !important; }
+
+    /* ── FRACTION PANEL ── */
+    .frac-backdrop { display:none; position:fixed; inset:0; background:rgba(0,0,0,.55); backdrop-filter:blur(6px); z-index:299; opacity:0; transition:opacity .3s ease; }
+    .frac-backdrop.visible { display:block; opacity:1; }
+    .frac-panel { position:fixed; top:0; right:0; bottom:0; left:auto; width:min(460px,100vw); height:100vh; background:rgba(14,14,28,.97); backdrop-filter:blur(20px); border-left:1px solid rgba(255,255,255,.08); box-shadow:-12px 0 40px rgba(0,0,0,.5); z-index:300; display:flex; flex-direction:column; overflow:hidden; transform:translateX(100%); transition:transform .35s cubic-bezier(.4,0,.2,1); box-sizing:border-box; }
+    .frac-panel.open { transform:translateX(0); }
+    .frac-header { display:flex; align-items:center; justify-content:space-between; padding:1rem 1.25rem .75rem; border-bottom:1px solid rgba(255,255,255,.07); flex-shrink:0; }
+    .frac-title { display:flex; align-items:center; gap:.55rem; font-size:1rem; font-weight:600; color:#e2e8f0; margin:0; }
+    .frac-title svg { color:#34d399; }
+    .frac-body { display:flex; flex-direction:column; gap:.9rem; padding:1rem 1.1rem; overflow-y:auto; flex:1; }
+    .frac-toggles { display:flex; gap:.5rem; }
+    .frac-tog-btn { flex:1; padding:.4rem .5rem; border-radius:8px; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.04); color:#94a3b8; font-size:.78rem; font-weight:600; cursor:pointer; }
+    .frac-tog-btn:hover { background:rgba(52,211,153,.12); color:#34d399; }
+    .frac-tog-btn.active { background:rgba(52,211,153,.18); border-color:rgba(52,211,153,.45); color:#34d399; }
+    .frac-display-wrap { background:rgba(0,0,0,.35); border:1px solid rgba(255,255,255,.07); border-radius:14px; padding:.85rem 1.1rem; min-height:110px; display:flex; flex-direction:column; align-items:flex-end; gap:.4rem; }
+    .frac-expr { font-size:.82rem; color:#94a3b8; min-height:1em; align-self:flex-end; }
+    .frac-input-area { display:flex; align-items:center; gap:.4rem; justify-content:flex-end; }
+    .frac-whole { font-size:2rem; font-weight:300; color:#e2e8f0; line-height:1; }
+    .frac-stack { display:flex; flex-direction:column; align-items:center; gap:1px; }
+    .frac-numer, .frac-denom { font-size:1.5rem; font-weight:500; font-family:'Outfit',monospace; color:#e2e8f0; min-width:1.2ch; text-align:center; line-height:1.1; padding:0 2px; transition:color .15s; }
+    .frac-input-active { color:#34d399 !important; }
+    .frac-line { width:100%; min-width:2ch; height:2px; background:#e2e8f0; border-radius:2px; }
+    .frac-result { font-size:1.8rem; font-weight:300; color:#34d399; align-self:flex-end; font-family:'Outfit',monospace; }
+    @keyframes fracResultPop { from { opacity:0; transform:scale(.85) translateY(6px); } to { opacity:1; transform:scale(1) translateY(0); } }
+    .frac-result-visible { animation:fracResultPop .35s cubic-bezier(.34,1.56,.64,1); }
+    .frac-pad { display:grid; grid-template-columns:repeat(4,1fr); gap:.45rem; }
+    .frac-pad button { padding:.7rem .25rem; border-radius:10px; border:1px solid rgba(255,255,255,.07); font-family:'Outfit',sans-serif; font-size:.95rem; font-weight:500; cursor:pointer; min-height:50px; }
+    .frac-p-num { background:rgba(255,255,255,.07); color:#e2e8f0; }
+    .frac-p-num:hover { background:rgba(255,255,255,.14); }
+    .frac-p-op { background:rgba(52,211,153,.1); color:#34d399; font-size:1.15rem; font-weight:600; }
+    .frac-p-op:hover { background:rgba(52,211,153,.22); }
+    .frac-p-fn { background:rgba(251,191,36,.08); color:#fbbf24; font-weight:600; font-size:.85rem; }
+    .frac-p-fn:hover { background:rgba(251,191,36,.18); }
+    .frac-p-eq { background:linear-gradient(135deg,#059669,#34d399); color:white; border:none; font-weight:700; font-size:1.15rem; }
+    .frac-hist-section { display:flex; flex-direction:column; gap:.5rem; flex:1; min-height:0; }
+    .frac-hist-header { display:flex; align-items:center; justify-content:space-between; font-size:.75rem; font-weight:600; text-transform:uppercase; color:#64748b; }
+    .frac-history { flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:.35rem; min-height:60px; max-height:180px; }
+    .frac-hist-empty { color:#64748b; font-size:.8rem; text-align:center; padding:1rem 0; opacity:.6; }
+    .frac-hist-row { display:flex; align-items:center; justify-content:space-between; gap:.5rem; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.05); border-radius:8px; padding:.45rem .75rem; font-size:.82rem; }
+    .frac-hist-row:hover { background:rgba(52,211,153,.06); }
+    .frac-hist-expr { color:#94a3b8; font-family:'Outfit',monospace; }
+    .frac-hist-eq { color:#34d399; font-weight:600; white-space:nowrap; }
+    </style>
 </head>
 <body>
     <div class="background-shapes">
@@ -25,6 +113,16 @@
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/>
                 <rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+            </svg>
+        </button>
+
+        <button id="frac-toggle" class="mode-toggle" aria-label="Calculadora de Fracciones" data-tooltip="Calculadora de Fracciones">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="2" x2="12" y2="22"/>
+                <line x1="5" y1="8" x2="19" y2="8"/>
+                <line x1="5" y1="16" x2="19" y2="16"/>
+                <circle cx="7" cy="5" r="2" fill="currentColor" stroke="none"/>
+                <circle cx="17" cy="19" r="2" fill="currentColor" stroke="none"/>
             </svg>
         </button>
 
@@ -485,10 +583,106 @@
     </div>
     <div class="prog-backdrop" id="prog-backdrop"></div>
 
+    <!-- ===== FRACTION CALCULATOR PANEL ===== -->
+    <div class="frac-panel" id="frac-panel"
+         role="dialog" aria-modal="true"
+         aria-label="Calculadora de Fracciones" aria-hidden="true"
+         style="position:fixed;top:0;right:0;bottom:0;left:auto;width:min(460px,100vw);height:100vh;z-index:300;display:flex;flex-direction:column;overflow:hidden;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);background:rgba(14,14,28,.97);box-sizing:border-box;">
+
+        <div class="frac-header">
+            <h2 class="frac-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="2" x2="12" y2="22"/><line x1="5" y1="8" x2="19" y2="8"/><line x1="5" y1="16" x2="19" y2="16"/>
+                    <circle cx="7" cy="5" r="2" fill="currentColor" stroke="none"/>
+                    <circle cx="17" cy="19" r="2" fill="currentColor" stroke="none"/>
+                </svg>
+                Calculadora de Fracciones
+            </h2>
+            <button id="frac-close" class="graph-close-btn" title="Cerrar" aria-label="Cerrar calculadora de fracciones">&#x2715;</button>
+        </div>
+
+        <div class="frac-body">
+
+            <!-- Toggle options -->
+            <div class="frac-toggles">
+                <button id="frac-tog-mix" class="frac-tog-btn active" title="Mostrar como número mixto">Mixto</button>
+                <button id="frac-tog-dec" class="frac-tog-btn" title="Mostrar como decimal">Decimal</button>
+            </div>
+
+            <!-- Display -->
+            <div class="frac-display-wrap">
+                <div class="frac-expr" id="frac-expr"></div>
+                <div class="frac-input-area">
+                    <span class="frac-whole" id="frac-whole"></span>
+                    <div class="frac-stack">
+                        <div class="frac-numer" id="frac-numer">▮</div>
+                        <div class="frac-line" id="frac-line"></div>
+                        <div class="frac-denom" id="frac-denom"></div>
+                    </div>
+                </div>
+                <div class="frac-result" id="frac-result"></div>
+            </div>
+
+            <!-- Pad -->
+            <div class="frac-pad" style="display:grid;grid-template-columns:repeat(4,1fr);gap:.45rem;">
+                <!-- Row 0: AC  CE  +/-  1/x -->
+                <button class="frac-p-fn" data-frac-action="clear">AC</button>
+                <button class="frac-p-fn" data-frac-action="ce">CE</button>
+                <button class="frac-p-fn" data-frac-action="negate">+/−</button>
+                <button class="frac-p-fn" data-frac-action="invert">1/x</button>
+
+                <!-- Row 1: 7 8 9  ÷ -->
+                <button class="frac-p-num" data-frac-digit="7">7</button>
+                <button class="frac-p-num" data-frac-digit="8">8</button>
+                <button class="frac-p-num" data-frac-digit="9">9</button>
+                <button class="frac-p-op"  data-frac-action="div">÷</button>
+
+                <!-- Row 2: 4 5 6  × -->
+                <button class="frac-p-num" data-frac-digit="4">4</button>
+                <button class="frac-p-num" data-frac-digit="5">5</button>
+                <button class="frac-p-num" data-frac-digit="6">6</button>
+                <button class="frac-p-op"  data-frac-action="mul">×</button>
+
+                <!-- Row 3: 1 2 3  − -->
+                <button class="frac-p-num" data-frac-digit="1">1</button>
+                <button class="frac-p-num" data-frac-digit="2">2</button>
+                <button class="frac-p-num" data-frac-digit="3">3</button>
+                <button class="frac-p-op"  data-frac-action="sub">−</button>
+
+                <!-- Row 4: SPC  0  /  + -->
+                <button class="frac-p-fn"  data-frac-action="space" title="Espacio para número mixto (ej: 2 3/4)">SPC</button>
+                <button class="frac-p-num" data-frac-digit="0">0</button>
+                <button class="frac-p-fn"  data-frac-action="slash">/</button>
+                <button class="frac-p-op"  data-frac-action="add">+</button>
+
+                <!-- Row 5: DEL  =  span 2 -->
+                <button class="frac-p-fn"  data-frac-action="delete">DEL</button>
+                <button class="frac-p-eq"  data-frac-action="equals" style="grid-column: span 3">=</button>
+            </div>
+
+            <!-- Steps history -->
+            <div class="frac-hist-section">
+                <div class="frac-hist-header">
+                    <span>Historial</span>
+                    <button id="frac-clear-hist" class="history-action-btn history-action-danger" title="Limpiar historial">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>
+                        Limpiar
+                    </button>
+                </div>
+                <div class="frac-history" id="frac-history">
+                    <div class="frac-hist-empty">Las operaciones aparecerán aquí.</div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div class="frac-backdrop" id="frac-backdrop"></div>
+
     <script src="js/script.js"></script>
     <script src="js/matrices.js"></script>
     <script src="js/history.js"></script>
     <script src="js/grapher.js"></script>
     <script src="js/programmer.js"></script>
+    <script src="js/fractions.js"></script>
 </body>
 </html>
