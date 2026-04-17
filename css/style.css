@@ -347,39 +347,46 @@ body.scientific-mode .scientific-grid {
 
 /* === Theme & Mode Toggles === */
 .top-controls {
+    align-items: center;
     position: absolute;
-    top: 10px;
+    top: 20px;
     left: 50%;
     transform: translateX(-50%);
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
     gap: 8px;
+    background: rgba(15, 23, 42, 0.4);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 8px 16px;
+    border-radius: 18px;
     z-index: 100;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     width: max-content;
     max-width: 95vw;
 }
 
 .theme-toggle, .mode-toggle {
-    background: var(--btn-bg);
-    border: 1px solid var(--btn-border);
-    color: var(--text-main);
-    width: 42px;
-    height: 42px;
+    flex-shrink: 0; min-width: 36px; min-height: 36px; overflow: hidden; box-sizing: border-box;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px var(--shadow);
+    transition: all 0.2s cubic-bezier(0.2, 0, 0, 1);
 }
 
 .theme-toggle:hover, .mode-toggle:hover {
-    background: var(--btn-hover-bg);
-    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    transform: translateY(-2px);
 }
 
 .theme-toggle:active, .mode-toggle:active {
@@ -1417,6 +1424,7 @@ body.light-theme .history-entry:hover { background: rgba(255,255,255,0.9); }
     flex-direction: column;
     background: rgba(255,255,255,0.02);
     border: 1px solid var(--calc-border);
+}
 
 /* ================================================================
    PROGRAMMER MODE PANEL
@@ -1718,9 +1726,11 @@ body.light-theme .history-entry:hover { background: rgba(255,255,255,0.9); }
 .light-theme .frac-p-num { background: rgba(0,0,0,0.05); color: #1e293b; }
 .light-theme .frac-hist-row { background: rgba(0,0,0,0.03); }
 
+
 /* Fix body overflow-x so position:fixed works correctly */
 body { overflow-x: visible; }
 html { overflow-x: hidden; }
+
 /* ===================================================================
    DESCRIPTIVE STATISTICS PANEL
    =================================================================== */
@@ -1734,69 +1744,69 @@ html { overflow-x: hidden; }
 .stats-panel {
     position: fixed; top: 0; right: 0; bottom: 0; width: 420px; max-width: 100vw;
     z-index: 300; display: flex; flex-direction: column;
-    background: var(--calc-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border-left: 1px solid var(--calc-border); transform: translateX(100%);
-    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    background: rgba(18, 18, 35, 0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(255, 255, 255, 0.08); box-shadow: -12px 0 40px rgba(0,0,0,0.5);
+    transform: translateX(100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
 }
 .stats-panel.open { transform: translateX(0); }
 
 .stats-pn-header {
     display: flex; align-items: center; justify-content: space-between;
-    padding: 18px 20px; border-bottom: 1px solid var(--calc-border);
-    background: rgba(255,255,255,0.03); flex-shrink: 0;
+    padding: 1rem 1.25rem 0.75rem; border-bottom: 1px solid rgba(255, 255, 255, 0.07); flex-shrink: 0;
 }
 .stats-pn-title {
-    display: flex; align-items: center; gap: 9px; font-size: 1.15rem; font-weight: 600;
-    background: linear-gradient(135deg, #f59e0b, #ef4444);
-    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0;
+    display: flex; align-items: center; gap: 0.55rem; font-size: 1.15rem; font-weight: 600; color: #e2e8f0; margin: 0;
 }
+.stats-pn-title svg { color: #a78bfa; }
 
-.stats-pn-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+.stats-pn-body { flex: 1; display: flex; flex-direction: column; overflow: hidden; padding: 1rem 1.1rem; }
 
-.stats-input-section { padding: 16px 20px; border-bottom: 1px solid var(--calc-border); }
+.stats-input-section { margin-bottom: 1rem; }
 .stats-label { display: block; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; }
 .stats-textarea {
-    width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--calc-border);
-    color: var(--text-main); font-family: 'Outfit', monospace; font-size: 0.9rem;
-    padding: 10px; border-radius: 12px; outline: none; resize: vertical; box-sizing: border-box;
+    width: 100%; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-main); font-family: 'Outfit', monospace; font-size: 0.95rem;
+    padding: 12px; border-radius: 12px; outline: none; resize: vertical; box-sizing: border-box;
+    transition: border-color 0.2s;
 }
-.stats-textarea:focus { border-color: rgba(245,158,11,0.5); }
+.stats-textarea:focus { border-color: rgba(167,139,250,0.5); }
 .stats-controls-row { display: flex; gap: 10px; margin-top: 10px; }
 .stats-controls-row > button { flex: 1; padding: 10px; }
 
-.stats-results-section { flex: 1; overflow-y: auto; padding: 16px 20px; scrollbar-width: thin; }
+.stats-results-section { flex: 1; overflow-y: auto; scrollbar-width: thin; }
 .stats-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
 .stats-empty-msg { grid-column: 1 / -1; text-align: center; color: var(--text-muted); font-size: 0.9rem; padding: 30px 0; }
 
 .stats-card {
-    background: rgba(255,255,255,0.03); border: 1px solid var(--calc-border);
+    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
     border-radius: 12px; padding: 12px; display: flex; flex-direction: column; gap: 4px;
 }
 .stats-card-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 .stats-card-value { font-size: 1.25rem; font-weight: 600; color: var(--text-main); word-break: break-all; }
-.stats-card-desc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.6; }
 
 /* ===================================================================
    FAVORITES PANEL
    =================================================================== */
 .fav-icon-btn {
-    background: rgba(255,255,255,0.05); border: 1px solid var(--calc-border);
-    color: var(--text-muted); font-size: 1rem; padding: 4px 8px; border-radius: 8px;
-    cursor: pointer; transition: all 0.2s; outline: none;
+    background: transparent; border: none;
+    color: var(--text-muted); padding: 4px; border-radius: 6px;
+    cursor: pointer; transition: all 0.2s; outline: none; display: flex; align-items: center; justify-content: center;
 }
 .fav-icon-btn:hover {
-    background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.3);
+    background: rgba(255,255,255,0.1);
     color: #a78bfa;
 }
 .fav-panel {
     position: fixed; top: 0; left: 0; bottom: 0; width: 320px; max-width: 100vw;
     z-index: 300; display: flex; flex-direction: column;
-    background: var(--calc-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
-    border-right: 1px solid var(--calc-border); transform: translateX(-100%);
-    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+    background: rgba(18, 18, 35, 0.97); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border-right: 1px solid rgba(255, 255, 255, 0.08); box-shadow: 12px 0 40px rgba(0,0,0,0.5);
+    transform: translateX(-100%); transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    box-sizing: border-box;
 }
 .fav-panel.open { transform: translateX(0); }
 
-
 .display { position: relative; }
 
+.mode-toggle svg, .theme-toggle svg { width: 18px; height: 18px; stroke-width: 2px; }
