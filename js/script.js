@@ -277,6 +277,20 @@ deleteButton.addEventListener('click', button => {
 
 // Keyboard support
 document.addEventListener('keydown', e => {
+    // Advanced shortcuts
+    if (e.altKey) {
+        if (e.key.toLowerCase() === 's') { e.preventDefault(); document.getElementById('mode-toggle')?.click(); return; }
+        if (e.key.toLowerCase() === 'g') { e.preventDefault(); document.getElementById('graph-toggle')?.click(); return; }
+        if (e.key.toLowerCase() === 'c') { e.preventDefault(); document.getElementById('unit-toggle')?.click(); return; }
+        if (e.key.toLowerCase() === 'h') { e.preventDefault(); document.getElementById('history-toggle')?.click(); return; }
+        if (e.key.toLowerCase() === 't') { e.preventDefault(); document.getElementById('theme-toggle')?.click(); return; }
+    }
+    if (e.key === 'F1') {
+        e.preventDefault();
+        alert('Atajos de teclado:\nAlt + S : Científica\nAlt + G : Gráfica\nAlt + C : Conversor\nAlt + H : Historial\nAlt + T : Tema');
+        return;
+    }
+
     if ((e.key >= 0 && e.key <= 9) || e.key === '.') {
         calculator.appendNumber(e.key);
         calculator.updateDisplay();
