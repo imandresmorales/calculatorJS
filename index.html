@@ -132,6 +132,13 @@
             </svg>
         </button>
 
+        <button id="stats-toggle" class="mode-toggle" aria-label="Estadística Descriptiva" data-tooltip="Estadística">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/>
+            </svg>
+        </button>
+
+
         <button id="graph-toggle" class="mode-toggle" aria-label="Toggle graph mode" data-tooltip="Calculadora Gráfica">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -678,11 +685,41 @@
     </div>
     <div class="frac-backdrop" id="frac-backdrop"></div>
 
+    <!-- ===== DESCRIPTIVE STATISTICS PANEL ===== -->
+    <div class="stats-panel" id="stats-panel" role="dialog" aria-modal="true" aria-label="Estadística Descriptiva" aria-hidden="true">
+        <div class="stats-pn-header">
+            <h2 class="stats-pn-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
+                Estadística Descriptiva
+            </h2>
+            <button id="stats-close" class="graph-close-btn" title="Cerrar" aria-label="Cerrar panel de estadística">&#x2715;</button>
+        </div>
+
+        <div class="stats-pn-body">
+            <div class="stats-input-section">
+                <label for="stats-data-input" class="stats-label">Introduce los datos (separados por comas o espacios):</label>
+                <textarea id="stats-data-input" class="stats-textarea" placeholder="Ej: 12, 15, 14, 19, 21.5, 12" rows="3"></textarea>
+                <div class="stats-controls-row">
+                    <button id="stats-clear-btn" class="history-action-btn history-action-danger">Limpiar</button>
+                    <button id="stats-calc-btn" class="mat-calc-btn">Calcular</button>
+                </div>
+            </div>
+
+            <div class="stats-results-section">
+                <div class="stats-grid" id="stats-results-grid">
+                    <div class="stats-empty-msg">Ingresa datos para ver las métricas.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="stats-backdrop" id="stats-backdrop"></div>
+
     <script src="js/script.js"></script>
     <script src="js/matrices.js"></script>
     <script src="js/history.js"></script>
     <script src="js/grapher.js"></script>
     <script src="js/programmer.js"></script>
     <script src="js/fractions.js"></script>
+    <script src="js/stats.js"></script>
 </body>
 </html>
