@@ -372,11 +372,19 @@ let isUnitMode = false;
 
 // ── Static conversion tables ───────────────────────────────────────────────
 const lengthConversionRates = {
-    'm': 1, 'km': 1000, 'cm': 0.01, 'mm': 0.001, 'in': 0.0254, 'ft': 0.3048
+    'm': 1, 'km': 1000, 'cm': 0.01, 'mm': 0.001, 'in': 0.0254, 'ft': 0.3048, 'yd': 0.9144
 };
 
 const timeConversionRates = {
     'seg': 1, 'min': 60, 'hr': 3600, 'dia': 86400, 'sem': 604800, 'año': 31536000
+};
+
+const weightConversionRates = {
+    'kg': 1, 'g': 0.001, 'lb': 0.453592, 'oz': 0.0283495, 'ton': 1000
+};
+
+const volumeConversionRates = {
+    'l': 1, 'ml': 0.001, 'gal': 3.78541, 'm3': 1000, 'floz': 0.0295735
 };
 
 // ── Currency state ─────────────────────────────────────────────────────────
@@ -415,6 +423,7 @@ const lengthOptionsHTML = `
     <option value="mm">Milímetros</option>
     <option value="in">Pulgadas</option>
     <option value="ft">Pies</option>
+    <option value="yd">Yardas</option>
 `;
 
 const timeOptionsHTML = `
@@ -424,6 +433,28 @@ const timeOptionsHTML = `
     <option value="dia">Días</option>
     <option value="sem">Semanas</option>
     <option value="año">Años</option>
+`;
+
+const weightOptionsHTML = `
+    <option value="kg">Kilogramos</option>
+    <option value="g">Gramos</option>
+    <option value="lb">Libras</option>
+    <option value="oz">Onzas</option>
+    <option value="ton">Toneladas</option>
+`;
+
+const volumeOptionsHTML = `
+    <option value="l">Litros</option>
+    <option value="ml">Mililitros</option>
+    <option value="gal">Galones</option>
+    <option value="m3">Metros Cúbicos</option>
+    <option value="floz">Onzas Líquidas</option>
+`;
+
+const temperatureOptionsHTML = `
+    <option value="c">Celsius (°C)</option>
+    <option value="f">Fahrenheit (°F)</option>
+    <option value="k">Kelvin (K)</option>
 `;
 
 // ── Fetch exchange rates (open.er-api.com – free, no key needed) ───────────
@@ -486,6 +517,24 @@ if (unitCategory) {
             unitFrom.value = 'hr';
             unitTo.value   = 'min';
             currencyInfo.style.display = 'none';
+        } else if (cat === 'weight') {
+            unitFrom.innerHTML = weightOptionsHTML;
+            unitTo.innerHTML   = weightOptionsHTML;
+            unitFrom.value = 'kg';
+            unitTo.value   = 'lb';
+            currencyInfo.style.display = 'none';
+        } else if (cat === 'volume') {
+            unitFrom.innerHTML = volumeOptionsHTML;
+            unitTo.innerHTML   = volumeOptionsHTML;
+            unitFrom.value = 'l';
+            unitTo.value   = 'gal';
+            currencyInfo.style.display = 'none';
+        } else if (cat === 'temperature') {
+            unitFrom.innerHTML = temperatureOptionsHTML;
+            unitTo.innerHTML   = temperatureOptionsHTML;
+            unitFrom.value = 'c';
+            unitTo.value   = 'f';
+            currencyInfo.style.display = 'none';
         } else if (cat === 'currency') {
             unitFrom.innerHTML = currencyOptionsHTML;
             unitTo.innerHTML   = currencyOptionsHTML;
@@ -525,8 +574,21 @@ function updateUnitConversion() {
         result = inUSD * exchangeRates[unitTo.value];
         // Update label too
         showRateLabel();
+    } else if (cat === 'temperature') {
+        let inCelsius = val;
+        // Convert to Celsius first
+        if (unitFrom.value === 'f') inCelsius = (val - 32) * 5/9;
+        else if (unitFrom.value === 'k') inCelsius = val - 273.15;
+        
+        // Convert from Celsius to Target
+        if (unitTo.value === 'c') result = inCelsius;
+        else if (unitTo.value === 'f') result = (inCelsius * 9/5) + 32;
+        else if (unitTo.value === 'k') result = inCelsius + 273.15;
     } else {
-        const rates = cat === 'time' ? timeConversionRates : lengthConversionRates;
+        const rates = cat === 'time' ? timeConversionRates : 
+                      cat === 'weight' ? weightConversionRates :
+                      cat === 'volume' ? volumeConversionRates :
+                      lengthConversionRates;
         const inBase = val * rates[unitFrom.value];
         result = inBase / rates[unitTo.value];
     }
