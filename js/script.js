@@ -223,6 +223,7 @@ const previousOperandTextElement = document.getElementById('previous-operand');
 const currentOperandTextElement = document.getElementById('current-operand');
 
 const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
+window.calculator = calculator;
 
 // Event Listeners
 numberButtons.forEach(button => {

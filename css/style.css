@@ -348,19 +348,24 @@ body.scientific-mode .scientific-grid {
 /* === Theme & Mode Toggles === */
 .top-controls {
     position: absolute;
-    top: 30px;
-    right: 30px;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
-    gap: 15px;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
     z-index: 100;
+    width: max-content;
+    max-width: 95vw;
 }
 
 .theme-toggle, .mode-toggle {
     background: var(--btn-bg);
     border: 1px solid var(--btn-border);
     color: var(--text-main);
-    width: 50px;
-    height: 50px;
+    width: 42px;
+    height: 42px;
     border-radius: 50%;
     display: flex;
     justify-content: center;
@@ -368,7 +373,8 @@ body.scientific-mode .scientific-grid {
     cursor: pointer;
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px var(--shadow);
 }
 
 .theme-toggle:hover, .mode-toggle:hover {
@@ -1790,4 +1796,7 @@ html { overflow-x: hidden; }
     transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .fav-panel.open { transform: translateX(0); }
+
+
+.display { position: relative; }
 
