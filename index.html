@@ -174,6 +174,12 @@
     
     <main class="calculator-container">
         <div class="display">
+            <div class="display-header" style="display:flex; justify-content:space-between; align-items:flex-start; width:100%; position:absolute; top:8px; left:8px; pointer-events:none;">
+                <div style="pointer-events:all; display:flex; gap:6px;">
+                    <button id="fav-toggle" class="fav-icon-btn" title="Ver Favoritos" aria-label="Favoritos">⭐</button>
+                    <button id="fav-save-btn" class="fav-icon-btn" title="Guardar expresión actual" aria-label="Guardar Favorito">➕</button>
+                </div>
+            </div>
             <div class="unit-controls" id="unit-controls" style="display: none;">
                 <select id="unit-category" class="unit-select" style="text-align: center;">
                     <option value="length">📏 Longitud</option>
@@ -717,6 +723,21 @@
     </div>
     <div class="stats-backdrop" id="stats-backdrop"></div>
 
+    <!-- ===== FAVORITES PANEL ===== -->
+    <div class="fav-panel" id="fav-panel" role="dialog" aria-modal="true" aria-label="Expresiones Favoritas" aria-hidden="true">
+        <div class="stats-pn-header">
+            <h2 class="stats-pn-title">⭐ Favoritos</h2>
+            <button id="fav-close" class="graph-close-btn" title="Cerrar">&#x2715;</button>
+        </div>
+        <div class="stats-pn-body" style="padding: 16px;">
+            <div id="fav-list" style="display: flex; flex-direction: column; gap: 10px;">
+                <!-- Favorites inject here -->
+            </div>
+            <div id="fav-empty" class="stats-empty-msg" style="display:none;">No tienes expresiones favoritas guardadas.</div>
+        </div>
+    </div>
+    <div class="stats-backdrop" id="fav-backdrop"></div>
+
     <script src="js/script.js"></script>
     <script src="js/matrices.js"></script>
     <script src="js/history.js"></script>
@@ -724,5 +745,6 @@
     <script src="js/programmer.js"></script>
     <script src="js/fractions.js"></script>
     <script src="js/stats.js"></script>
+    <script src="js/favorites.js"></script>
 </body>
 </html>

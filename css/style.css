@@ -1769,3 +1769,25 @@ html { overflow-x: hidden; }
 .stats-card-label { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 .stats-card-value { font-size: 1.25rem; font-weight: 600; color: var(--text-main); word-break: break-all; }
 .stats-card-desc { font-size: 0.7rem; color: var(--text-muted); opacity: 0.6; }
+
+/* ===================================================================
+   FAVORITES PANEL
+   =================================================================== */
+.fav-icon-btn {
+    background: rgba(255,255,255,0.05); border: 1px solid var(--calc-border);
+    color: var(--text-muted); font-size: 1rem; padding: 4px 8px; border-radius: 8px;
+    cursor: pointer; transition: all 0.2s; outline: none;
+}
+.fav-icon-btn:hover {
+    background: rgba(167,139,250,0.15); border-color: rgba(167,139,250,0.3);
+    color: #a78bfa;
+}
+.fav-panel {
+    position: fixed; top: 0; left: 0; bottom: 0; width: 320px; max-width: 100vw;
+    z-index: 300; display: flex; flex-direction: column;
+    background: var(--calc-bg); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+    border-right: 1px solid var(--calc-border); transform: translateX(-100%);
+    transition: transform 0.38s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.fav-panel.open { transform: translateX(0); }
+
