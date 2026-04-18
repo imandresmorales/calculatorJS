@@ -156,6 +156,10 @@
                 <line x1="6" y1="20" x2="6" y2="14"></line>
             </svg>
         </button>
+
+        <button id="finance-toggle" class="mode-toggle" aria-label="Finanzas" data-tooltip="Finanzas">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </button>
         <button id="mode-toggle" class="mode-toggle" aria-label="Toggle mode" data-tooltip="Cambiar modo Científica / Estándar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
@@ -744,6 +748,35 @@
     </div>
     <div class="stats-backdrop" id="fav-backdrop"></div>
 
+    <!-- ===== FINANCE PANEL ===== -->
+    <div class="stats-panel" id="finance-panel" role="dialog" aria-modal="true" aria-label="Finanzas Personales" aria-hidden="true">
+        <div class="stats-pn-header">
+            <h2 class="stats-pn-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Finanzas
+            </h2>
+            <button id="finance-close" class="graph-close-btn" title="Cerrar Panel">&#x2715;</button>
+        </div>
+        <div class="stats-pn-body">
+            <div class="finance-type-selector" style="margin-bottom: 1.25rem;">
+                <label class="stats-label">Herramienta Financiera:</label>
+                <select id="finance-mode" class="stats-textarea" style="padding: 10px; height: auto; cursor: pointer;">
+                    <option value="compound">Interés Compuesto</option>
+                    <option value="simple">Interés Simple</option>
+                    <option value="loan">Amortización de Préstamo</option>
+                </select>
+            </div>
+            <div id="finance-inputs" class="stats-input-section" style="display: flex; flex-direction: column; gap: 12px;">
+                <!-- Injected via JS -->
+            </div>
+            <button id="finance-calc-btn" class="btn btn-operator" style="width:100%; margin-top: 15px; background: rgba(52,211,153,0.15); color: #34d399; font-weight: 600;">Calcular</button>
+            <div class="stats-results-section" id="finance-results" style="margin-top: 20px;">
+                <div class="stats-empty-msg">Ingresa los valores para calcular.</div>
+            </div>
+        </div>
+    </div>
+    <div class="stats-backdrop" id="finance-backdrop"></div>
+
     <script src="js/script.js?v=5"></script>
     <script src="js/matrices.js?v=5"></script>
     <script src="js/history.js?v=5"></script>
@@ -753,5 +786,6 @@
 
     <script src="js/stats.js?v=5"></script>
     <script src="js/favorites.js?v=5"></script>
+    <script src="js/finance.js?v=5"></script>
 </body>
 </html>
