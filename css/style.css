@@ -369,7 +369,7 @@ body.scientific-mode .scientific-grid {
 }
 
 .theme-toggle, .mode-toggle {
-    flex-shrink: 0; min-width: 36px; min-height: 36px; overflow: hidden; box-sizing: border-box;
+    flex-shrink: 0; min-width: 36px; min-height: 36px; box-sizing: border-box;
     background: transparent;
     border: none;
     color: var(--text-muted);
