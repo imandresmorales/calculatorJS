@@ -172,6 +172,10 @@
         <button id="health-toggle" class="mode-toggle" aria-label="Salud" data-tooltip="Salud">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>
         </button>
+
+        <button id="tips-toggle" class="mode-toggle" aria-label="Propinas" data-tooltip="Propinas">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+        </button>
         <button id="mode-toggle" class="mode-toggle" aria-label="Toggle mode" data-tooltip="Cambiar modo Científica / Estándar">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <rect x="4" y="2" width="16" height="20" rx="2" ry="2"></rect>
@@ -876,6 +880,50 @@
     </div>
     <div class="stats-backdrop" id="health-backdrop"></div>
 
+    <!-- ===== TIPS PANEL ===== -->
+    <div class="stats-panel" id="tips-panel" role="dialog" aria-modal="true" aria-label="Calculadora de Propinas" aria-hidden="true">
+        <div class="stats-pn-header">
+            <h2 class="stats-pn-title">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+                Propinas y Cuentas
+            </h2>
+            <button id="tips-close" class="graph-close-btn" title="Cerrar Panel">&#x2715;</button>
+        </div>
+        <div class="stats-pn-body">
+            <div id="tips-inputs" class="stats-input-section" style="display: flex; flex-direction: column; gap: 12px;">
+                <div>
+                    <label class="stats-label">Total de la Cuenta ($)</label>
+                    <input type="number" id="tips-bill" class="stats-textarea" placeholder="0.00" step="0.01">
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <div style="flex:1;">
+                        <label class="stats-label">Propina (%)</label>
+                        <select id="tips-percent" class="stats-textarea" style="height:auto; padding:8px;">
+                            <option value="10">10%</option>
+                            <option value="15" selected>15%</option>
+                            <option value="18">18%</option>
+                            <option value="20">20%</option>
+                            <option value="custom">Personalizado</option>
+                        </select>
+                    </div>
+                    <div style="flex:1; display:none;" id="tips-custom-box">
+                        <label class="stats-label">Valor %</label>
+                        <input type="number" id="tips-custom-val" class="stats-textarea" value="15">
+                    </div>
+                </div>
+                <div>
+                    <label class="stats-label">Dividir entre N personas</label>
+                    <input type="number" id="tips-split" class="stats-textarea" value="1" min="1">
+                </div>
+            </div>
+            <button id="tips-calc-btn" class="btn btn-operator" style="width:100%; margin-top: 15px; background: rgba(52,211,153,0.15); color: #34d399; font-weight: 600;">Dividir Cuenta</button>
+            <div class="stats-results-section" id="tips-results" style="margin-top: 20px;">
+                <div class="stats-empty-msg">Ingresa el total para dividir.</div>
+            </div>
+        </div>
+    </div>
+    <div class="stats-backdrop" id="tips-backdrop"></div>
+
     <script src="js/script.js?v=5"></script>
     <script src="js/matrices.js?v=5"></script>
     <script src="js/history.js?v=5"></script>
@@ -889,5 +937,6 @@
     <script src="js/equations.js?v=5"></script>
     <script src="js/datetime.js?v=5"></script>
     <script src="js/health.js?v=5"></script>
+    <script src="js/tips.js?v=5"></script>
 </body>
 </html>
