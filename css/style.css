@@ -96,7 +96,7 @@ body {
 .shape-1 {
     width: 60vw;
     height: 60vh;
-    background: linear-gradient(135deg, #a855f7, #ec4899);
+    background: var(--grad-1);
     top: -20vh;
     left: -10vw;
     opacity: 0.6;
@@ -105,7 +105,7 @@ body {
 .shape-2 {
     width: 50vw;
     height: 50vh;
-    background: linear-gradient(135deg, #06b6d4, #3b82f6);
+    background: var(--grad-2);
     bottom: -10vh;
     right: -10vw;
     animation-delay: -10s;
