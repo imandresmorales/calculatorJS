@@ -70,6 +70,28 @@
         localStorage.removeItem('calc_custom_theme');
     });
 
+    // Presets
+    const presets = {
+        neon: { c1: '#a855f7', c2: '#ec4899', op: 90 },
+        ocean: { c1: '#0ea5e9', c2: '#10b981', op: 90 },
+        sunset: { c1: '#f97316', c2: '#eab308', op: 95 },
+        hacker: { c1: '#000000', c2: '#22c55e', op: 85 },
+        royal: { c1: '#4c1d95', c2: '#38bdf8', op: 50 }
+    };
+
+    document.querySelectorAll('.theme-preset-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const p = presets[e.target.dataset.preset];
+            if (p) {
+                color1Input.value = p.c1;
+                color2Input.value = p.c2;
+                opacityInput.value = p.op;
+                applyTheme(p.c1, p.c2, p.op);
+                saveTheme(p.c1, p.c2, p.op);
+            }
+        });
+    });
+
     // Initialize CSS variables to match defaults if not set in style.css directly via JS
     // We update the style.css variables format slightly via JS
     loadTheme();
