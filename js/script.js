@@ -264,6 +264,12 @@ equalsButton.addEventListener('click', () => {
     calculator.compute();
     if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
     calculator.updateDisplay();
+    
+    // a11y announcer
+    const announcer = document.getElementById('a11y-announcer');
+    if (announcer) {
+        announcer.textContent = `Resultado: ${calculator.currentOperand}`;
+    }
 });
 
 clearButton.addEventListener('click', button => {
@@ -302,6 +308,11 @@ document.addEventListener('keydown', e => {
         calculator.compute();
         if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
         calculator.updateDisplay();
+        
+        const announcer = document.getElementById('a11y-announcer');
+        if (announcer) {
+            announcer.textContent = `Resultado: ${calculator.currentOperand}`;
+        }
     }
     if (e.key === 'Backspace') {
         calculator.delete();
