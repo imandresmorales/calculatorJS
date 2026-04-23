@@ -225,9 +225,22 @@ const currentOperandTextElement = document.getElementById('current-operand');
 const calculator = new Calculator(previousOperandTextElement, currentOperandTextElement);
 window.calculator = calculator;
 
+// ── Haptic Feedback (#26) ────────────────────────────────────────────────────
+/**
+ * Triggers a short vibration on supported devices.
+ * Silently ignored on browsers that don't support the Vibration API.
+ * @param {'tap'|'error'|'success'} type
+ */
+function haptic(type = 'tap') {
+    if (!navigator.vibrate) return;
+    const patterns = { tap: 10, error: [50, 30, 50], success: [15, 10, 15] };
+    navigator.vibrate(patterns[type] ?? 10);
+}
+
 // Event Listeners
 numberButtons.forEach(button => {
     button.addEventListener('click', () => {
+        haptic('tap');
         calculator.appendNumber(button.dataset.number);
         calculator.updateDisplay();
     });
@@ -235,6 +248,7 @@ numberButtons.forEach(button => {
 
 operationButtons.forEach(button => {
     button.addEventListener('click', () => {
+        haptic('tap');
         calculator.chooseOperation(button.dataset.operator);
         calculator.updateDisplay();
     });
@@ -264,20 +278,19 @@ equalsButton.addEventListener('click', () => {
     calculator.compute();
     if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
     calculator.updateDisplay();
-    
-    // a11y announcer
+    haptic('success');
     const announcer = document.getElementById('a11y-announcer');
-    if (announcer) {
-        announcer.textContent = `Resultado: ${calculator.currentOperand}`;
-    }
+    if (announcer) announcer.textContent = `Resultado: ${calculator.currentOperand}`;
 });
 
-clearButton.addEventListener('click', button => {
+clearButton.addEventListener('click', () => {
+    haptic('error');
     calculator.clear();
     calculator.updateDisplay();
 });
 
-deleteButton.addEventListener('click', button => {
+deleteButton.addEventListener('click', () => {
+    haptic('tap');
     calculator.delete();
     calculator.updateDisplay();
 });
