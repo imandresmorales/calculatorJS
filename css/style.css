@@ -42,6 +42,41 @@ body.light-theme {
     --grad-3: rgba(253, 164, 175, 0.4);
 }
 
+/* === High Contrast Theme (#25) === */
+body.high-contrast {
+    --bg-1: #000000;
+    --calc-bg: #111111;
+    --calc-border: #ffffff;
+    --text-main: #ffffff;
+    --text-muted: #ffff00;
+    --btn-bg: #000000;
+    --btn-border: #ffffff;
+    --btn-hover-bg: #333333;
+    --btn-active-bg: #444444;
+    --glow-op: #ffff00;
+    --glow-ac: #ff4444;
+    --grad-1: rgba(0,0,0,0);
+    --grad-2: rgba(0,0,0,0);
+    --grad-3: rgba(0,0,0,0);
+}
+body.high-contrast .background-shapes { display: none; }
+body.high-contrast .calculator-container {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid #ffffff;
+    box-shadow: none;
+}
+body.high-contrast .btn {
+    border: 1px solid #ffffff;
+    box-shadow: none;
+    border-radius: 8px;
+}
+body.high-contrast .top-controls {
+    backdrop-filter: none;
+    border: 1px solid #ffffff;
+    background: #000000;
+}
+
 * {
     box-sizing: border-box;
     margin: 0;

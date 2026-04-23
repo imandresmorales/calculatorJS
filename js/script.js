@@ -384,6 +384,17 @@ if (modeToggleBtn) {
     });
 }
 
+// High Contrast Mode (#25)
+const highContrastBtn = document.getElementById('high-contrast-toggle');
+if (highContrastBtn) {
+    const isHC = localStorage.getItem('high-contrast') === 'on';
+    if (isHC) document.body.classList.add('high-contrast');
+    highContrastBtn.addEventListener('click', () => {
+        const active = document.body.classList.toggle('high-contrast');
+        localStorage.setItem('high-contrast', active ? 'on' : 'off');
+    });
+}
+
 // Unit Converter Logic
 const unitToggleBtn = document.getElementById('unit-toggle');
 const unitControls = document.getElementById('unit-controls');
