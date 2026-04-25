@@ -105,7 +105,8 @@ class Calculator {
                 break;
             case '÷':
                 if (current === 0) {
-                    alert('No se puede dividir por cero');
+                    if (window.showToast) showToast('No se puede dividir por cero', 'error');
+                    else alert('No se puede dividir por cero');
                     this.clear();
                     return;
                 }
@@ -307,7 +308,11 @@ document.addEventListener('keydown', e => {
     }
     if (e.key === 'F1') {
         e.preventDefault();
-        alert('Atajos de teclado:\nAlt + S : Científica\nAlt + G : Gráfica\nAlt + C : Conversor\nAlt + H : Historial\nAlt + T : Tema');
+        if (window.showToast) {
+            showToast('Alt+S: Científica  |  Alt+G: Gráfica  |  Alt+C: Conversor  |  Alt+H: Historial  |  Alt+T: Tema', 'info');
+        } else {
+            alert('Atajos de teclado:\nAlt + S : Científica\nAlt + G : Gráfica\nAlt + C : Conversor\nAlt + H : Historial\nAlt + T : Tema');
+        }
         return;
     }
 

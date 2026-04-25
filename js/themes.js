@@ -60,6 +60,7 @@
         const op = opacityInput.value;
         applyTheme(c1, c2, op);
         saveTheme(c1, c2, op);
+        if (window.showToast) showToast('Tema guardado correctamente', 'success');
     });
 
     resetBtn.addEventListener('click', () => {
@@ -68,6 +69,7 @@
         opacityInput.value = defaultTheme.opacity;
         applyTheme(defaultTheme.color1, defaultTheme.color2, defaultTheme.opacity);
         localStorage.removeItem('calc_custom_theme');
+        if (window.showToast) showToast('Tema restaurado al original', 'info');
     });
 
     // Presets
