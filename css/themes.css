@@ -1,0 +1,84 @@
+/*
+ * themes.css — Design Token & Theme Overrides
+ * Part of the CSS modular split (#28).
+ * Contains: :root variables, light-theme, high-contrast.
+ */
+
+:root {
+    --bg-1: #0f172a;
+    
+    --calc-bg: rgba(15, 23, 42, 0.5);
+    --calc-border: rgba(255, 255, 255, 0.1);
+    
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    
+    --btn-bg: rgba(255, 255, 255, 0.03);
+    --btn-border: rgba(255, 255, 255, 0.05);
+    --btn-hover-bg: rgba(255, 255, 255, 0.1);
+    --btn-active-bg: rgba(255, 255, 255, 0.01);
+    
+    --glow-op: #38bdf8;
+    --glow-ac: #fb7185;
+    
+    --grad-1: rgba(76, 29, 149, 0.3);
+    --grad-2: rgba(56, 189, 248, 0.2);
+    --grad-3: rgba(251, 113, 133, 0.2);
+}
+
+body.light-theme {
+    --bg-1: #f1f5f9;
+    
+    --calc-bg: rgba(255, 255, 255, 0.65);
+    --calc-border: rgba(255, 255, 255, 0.6);
+    
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    
+    --btn-bg: rgba(255, 255, 255, 0.6);
+    --btn-border: rgba(0, 0, 0, 0.06);
+    --btn-hover-bg: rgba(255, 255, 255, 0.9);
+    --btn-active-bg: rgba(255, 255, 255, 0.4);
+    
+    --glow-op: #0284c7;
+    --glow-ac: #e11d48;
+    
+    --grad-1: rgba(167, 139, 250, 0.4);
+    --grad-2: rgba(125, 211, 252, 0.5);
+    --grad-3: rgba(253, 164, 175, 0.4);
+}
+
+/* === High Contrast Theme (#25) === */
+body.high-contrast {
+    --bg-1: #000000;
+    --calc-bg: #111111;
+    --calc-border: #ffffff;
+    --text-main: #ffffff;
+    --text-muted: #ffff00;
+    --btn-bg: #000000;
+    --btn-border: #ffffff;
+    --btn-hover-bg: #333333;
+    --btn-active-bg: #444444;
+    --glow-op: #ffff00;
+    --glow-ac: #ff4444;
+    --grad-1: rgba(0,0,0,0);
+    --grad-2: rgba(0,0,0,0);
+    --grad-3: rgba(0,0,0,0);
+}
+body.high-contrast .background-shapes { display: none; }
+body.high-contrast .calculator-container {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid #ffffff;
+    box-shadow: none;
+}
+body.high-contrast .btn {
+    border: 1px solid #ffffff;
+    box-shadow: none;
+    border-radius: 8px;
+}
+body.high-contrast .top-controls {
+    backdrop-filter: none;
+    border: 1px solid #ffffff;
+    background: #000000;
+}
