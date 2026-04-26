@@ -54,6 +54,7 @@ Dado que al proyecto implementa recargas y utilidades modernas en tiempo extra, 
    npx http-server -p 8080
    ```
 3. Dirígete en tu navegador a `http://127.0.0.1:8080`.
+4. Tambien puedes abrir el archivo index.html
 
 ---
 
