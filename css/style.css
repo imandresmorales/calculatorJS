@@ -1861,3 +1861,161 @@ html { overflow-x: hidden; }
     transform: translateX(-50%) translateY(0);
 }
 /* Toast styles → see css/toast.css */
+
+/* ======================================================
+   RESPONSIVE — Tablet / iPad  (#32)
+   ====================================================== */
+
+/* Medium screens: make the top-controls wrap gracefully and
+   increase touch target size for finger presses */
+@media screen and (min-width: 600px) and (max-width: 1024px) {
+    body {
+        align-items: center;
+    }
+
+    .calculator-container {
+        width: min(480px, 90vw);
+        padding: 30px;
+        gap: 18px;
+    }
+
+    .btn {
+        padding: 18px 0;
+        font-size: 1.4rem;
+        border-radius: 18px;
+        min-height: 58px; /* larger touch targets */
+    }
+
+    /* Landscape tablets: stretch to use more width */
+    @media (orientation: landscape) {
+        .calculator-container {
+            width: min(640px, 85vw);
+        }
+
+        body.scientific-mode .calculator-container {
+            width: min(900px, 95vw);
+        }
+    }
+
+    /* Top dock wraps into two rows on medium screens */
+    .top-controls {
+        max-width: 90vw;
+        gap: 6px;
+        padding: 8px 12px;
+    }
+
+    /* Panels become full-width sheets on tablets */
+    .stats-panel {
+        width: min(480px, 96vw) !important;
+    }
+}
+
+/* Portrait phone + tablet: stack content properly */
+@media screen and (max-width: 599px) {
+    body {
+        justify-content: flex-start;
+        padding-top: 80px; /* leave room for the dock */
+    }
+
+    .calculator-container {
+        margin: 0 auto;
+    }
+}
+
+/* ======================================================
+   MINI MODE (#35)
+   ====================================================== */
+
+/* Mini mode activated via JS — shrinks the calc into a
+   compact floating widget */
+body.mini-mode {
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 20px;
+}
+
+body.mini-mode .top-controls {
+    display: none !important;
+}
+
+body.mini-mode .background-shapes {
+    filter: blur(120px);
+    opacity: 0.4;
+}
+
+body.mini-mode .calculator-container {
+    width: 240px !important;
+    padding: 18px !important;
+    border-radius: 24px;
+    gap: 12px !important;
+    box-shadow:
+        0 20px 60px rgba(0,0,0,0.6),
+        inset 0 1px 1px rgba(255,255,255,0.15);
+    transition: width 0.3s ease, padding 0.3s ease;
+}
+
+body.mini-mode .display {
+    min-height: 52px !important;
+}
+
+body.mini-mode .previous-operand {
+    font-size: 0.75rem !important;
+}
+
+body.mini-mode .current-operand {
+    font-size: 2.2rem !important;
+}
+
+body.mini-mode .btn {
+    padding: 10px 0 !important;
+    font-size: 1rem !important;
+    border-radius: 12px !important;
+}
+
+body.mini-mode .buttons-grid {
+    gap: 8px !important;
+}
+
+body.mini-mode .grids-wrapper {
+    gap: 0;
+}
+
+/* Hide scientific grid in mini mode */
+body.mini-mode .scientific-grid {
+    display: none !important;
+}
+
+/* Hide the unit bar in mini mode */
+body.mini-mode #unit-controls,
+body.mini-mode .display-header {
+    display: none !important;
+}
+
+/* Mini-mode restore button — floating pill */
+#mini-restore-btn {
+    display: none;
+    position: fixed;
+    top: 14px;
+    right: 14px;
+    z-index: 2000;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.15);
+    color: var(--text-main);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.03em;
+    transition: background 0.2s, transform 0.2s;
+}
+
+#mini-restore-btn:hover {
+    background: rgba(56,189,248,0.25);
+    transform: scale(1.05);
+}
+
+body.mini-mode #mini-restore-btn {
+    display: block;
+}
