@@ -413,6 +413,32 @@ if (highContrastBtn) {
     });
 }
 
+// Mini Mode (#35)
+(function () {
+    const miniToggle   = document.getElementById('mini-mode-toggle');
+    const miniRestore  = document.getElementById('mini-restore-btn');
+
+    function enableMini() {
+        document.body.classList.add('mini-mode');
+        localStorage.setItem('calc_mini_mode', 'on');
+        if (window.showToast) showToast('Modo Mini activado', 'info');
+    }
+
+    function disableMini() {
+        document.body.classList.remove('mini-mode');
+        localStorage.setItem('calc_mini_mode', 'off');
+        if (window.showToast) showToast('Modo expandido', 'info');
+    }
+
+    if (miniToggle)  miniToggle.addEventListener('click', enableMini);
+    if (miniRestore) miniRestore.addEventListener('click', disableMini);
+
+    // Restore state from localStorage
+    if (localStorage.getItem('calc_mini_mode') === 'on') {
+        document.body.classList.add('mini-mode');
+    }
+})();
+
 // Unit Converter Logic
 const unitToggleBtn = document.getElementById('unit-toggle');
 const unitControls = document.getElementById('unit-controls');
