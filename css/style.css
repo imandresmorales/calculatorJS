@@ -2019,3 +2019,61 @@ body.mini-mode .display-header {
 body.mini-mode #mini-restore-btn {
     display: block;
 }
+
+/* ===== Presentation Mode (#39) ===== */
+body.presentation-mode .top-controls { display: none; }
+body.presentation-mode .buttons-grid { display: none; }
+body.presentation-mode .scientific-grid { display: none !important; }
+
+body.presentation-mode .display {
+    min-height: 60vh;
+    font-size: 1.5em;
+    justify-content: center;
+    align-items: flex-end;
+    padding: 40px 20px;
+}
+
+body.presentation-mode .current-operand {
+    font-size: 6rem;
+    letter-spacing: -4px;
+    white-space: normal;
+    word-break: break-all;
+}
+
+body.presentation-mode .previous-operand {
+    font-size: 2rem;
+}
+
+/* Exit button overlay */
+#presentation-exit {
+    display: none;
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 9990;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--text-main);
+    border-radius: 10px;
+    padding: 8px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    backdrop-filter: blur(12px);
+    transition: background 0.2s;
+}
+#presentation-exit:hover { background: rgba(255,255,255,0.22); }
+
+body.presentation-mode #presentation-exit { display: block; }
+
+/* Presentation: keyboard input hint */
+body.presentation-mode .presentation-hint {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    pointer-events: none;
+}
