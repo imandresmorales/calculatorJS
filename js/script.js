@@ -282,6 +282,7 @@ equalsButton.addEventListener('click', () => {
     haptic('success');
     const announcer = document.getElementById('a11y-announcer');
     if (announcer) announcer.textContent = `Resultado: ${calculator.currentOperand}`;
+    if (window.checkEasterEgg) checkEasterEgg(calculator.currentOperand);
 });
 
 clearButton.addEventListener('click', () => {
