@@ -3,15 +3,12 @@
  *
  * Buenas prácticas aplicadas:
  *  • IIFE para encapsular el módulo y no contaminar el scope global.
- *  • localStorage con validación estricta de estructura, longitudes máximas
- *    y cuota de almacenamiento (50 KB) para evitar abuso.
- *  • Renderizado con textContent — nunca innerHTML con datos del usuario
- *    (previene XSS aunque el origen sea localStorage).
- *  • Mitigación de CSV Injection (OWASP): los valores peligrosos se prefijan
- *    con comilla simple antes de exportar.
+ *  • IndexedDB como almacenamiento principal (#33).
+ *  • localStorage como fallback automático si IndexedDB no está disponible.
+ *  • Renderizado con textContent — nunca innerHTML con datos del usuario (XSS).
+ *  • Mitigación de CSV Injection (OWASP).
  *  • Los Object URLs se revocan después del uso para evitar memory leaks.
  *  • Comunicación con script.js mediante CustomEvents (bajo acoplamiento).
- *  • Todos los accesos a localStorage se envuelven en try/catch.
  */
 
 (function () {
@@ -47,16 +44,35 @@
         );
     }
 
-    // ── Persistencia ──────────────────────────────────────────────────────────
+    // ── Persistencia con IndexedDB + localStorage fallback (#33) ─────────────
+    const useIDB = typeof CalcDB !== 'undefined';
+
     function loadFromStorage() {
+        if (useIDB) {
+            // IndexedDB: load async, then re-render
+            CalcDB.getAll(CalcDB.STORES.history).then(rows => {
+                entries = rows.map(r => ({
+                    id:         String(r.id),
+                    expression: String(r.expression).slice(0, MAX_EXPR_LENGTH),
+                    result:     String(r.result).slice(0, MAX_RESULT_LENGTH),
+                    timestamp:  r.timestamp,
+                })).filter(isValidEntry).slice(0, MAX_ENTRIES);
+                renderList();
+            }).catch(() => {
+                entries = loadFromLocalStorage();
+                renderList();
+            });
+            return []; // initial empty; will re-render on promise resolve
+        }
+        return loadFromLocalStorage();
+    }
+
+    function loadFromLocalStorage() {
         try {
             const raw = localStorage.getItem(STORAGE_KEY);
             if (!raw) return [];
-
             const parsed = JSON.parse(raw);
             if (!Array.isArray(parsed)) return [];
-
-            // Filtrar y sanear cada entrada
             return parsed
                 .filter(isValidEntry)
                 .map(e => ({
@@ -66,36 +82,25 @@
                     timestamp:  e.timestamp
                 }))
                 .slice(0, MAX_ENTRIES);
-        } catch {
-            // JSON inválido u otro error — comenzar con historial vacío
-            return [];
-        }
+        } catch { return []; }
     }
 
     function saveToStorage() {
+        if (useIDB) return; // IDB writes happen in addEntry / removeEntry
         try {
             let toSave = entries.slice(0, MAX_ENTRIES);
             let json   = JSON.stringify(toSave);
-
-            // Si supera la cuota interna, descartar las entradas más antiguas
             while (json.length > MAX_STORAGE_BYTES && toSave.length > 1) {
                 toSave = toSave.slice(0, Math.floor(toSave.length * 0.75));
                 json   = JSON.stringify(toSave);
             }
-
             localStorage.setItem(STORAGE_KEY, json);
         } catch (err) {
-            // localStorage puede estar deshabilitado o lleno — falla silenciosa
             console.warn('[History] No se pudo guardar en localStorage:', err.message);
         }
     }
 
     // ── Gestión de entradas ───────────────────────────────────────────────────
-    /**
-     * Genera un ID único combinando timestamp unix + nonce aleatorio.
-     * No se usa crypto.randomUUID() para mantener compatibilidad amplia.
-     * @returns {string}
-     */
     function generateId() {
         return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
     }
@@ -105,24 +110,41 @@
             id:         generateId(),
             expression: String(expression).trim().slice(0, MAX_EXPR_LENGTH),
             result:     String(result).trim().slice(0, MAX_RESULT_LENGTH),
-            timestamp:  new Date().toISOString()
+            timestamp:  new Date().toISOString(),
         };
-        entries.unshift(entry);                             // más reciente primero
+
+        if (useIDB) {
+            CalcDB.addEntry(CalcDB.STORES.history, entry).catch(() => {});
+        }
+
+        entries.unshift(entry);
         if (entries.length > MAX_ENTRIES) entries.length = MAX_ENTRIES;
-        saveToStorage();
+        if (!useIDB) saveToStorage();
         renderList();
         animateHistoryBadge();
     }
 
     function removeEntry(id) {
+        if (useIDB) {
+            // IDB keys are auto-incremented numbers; find the IDB key from our entries
+            CalcDB.getAll(CalcDB.STORES.history).then(rows => {
+                const row = rows.find(r => String(r.id) === String(id) ||
+                    (r.expression + r.timestamp) === (entries.find(e => e.id === id)?.expression + entries.find(e => e.id === id)?.timestamp));
+                if (row && row.id) CalcDB.delete(CalcDB.STORES.history, row.id).catch(() => {});
+            }).catch(() => {});
+        }
         entries = entries.filter(e => e.id !== id);
-        saveToStorage();
+        if (!useIDB) saveToStorage();
         renderList();
     }
 
     function clearAll() {
         entries = [];
-        try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+        if (useIDB) {
+            CalcDB.clear(CalcDB.STORES.history).catch(() => {});
+        } else {
+            try { localStorage.removeItem(STORAGE_KEY); } catch { /* noop */ }
+        }
         renderList();
     }
 
