@@ -260,30 +260,88 @@ sciButtons.forEach(button => {
     button.addEventListener('click', () => {
         if (button.dataset.action === 'pow') {
             calculator.chooseOperation('^');
+            calculator.updateDisplay();
+            return;
+        }
+
+        const prevVal = calculator.currentOperand;
+        const action  = button.dataset.action;
+        const value   = parseFloat(prevVal);
+
+        // Offload to Web Worker if available (#34), else fall back synchronously
+        if (window.CalcWorker && !isNaN(value)) {
+            button.disabled = true;
+            CalcWorker.run({ type: 'scientific', action, value })
+                .then(result => {
+                    calculator.currentOperand = String(result);
+                    calculator.operation = undefined;
+                    calculator.previousOperand = '';
+                    calculator.updateDisplay();
+                    if (!isNaN(result) && String(result) !== prevVal) {
+                        emitHistoryEvent(`${action}(${prevVal})`, String(result));
+                    }
+                })
+                .catch(() => {
+                    // Fallback to sync on error
+                    calculator.computeScientific(action);
+                    calculator.updateDisplay();
+                })
+                .finally(() => { button.disabled = false; });
         } else {
-            const prevVal  = calculator.currentOperand;
-            const action   = button.dataset.action;
             calculator.computeScientific(action);
-            const newVal   = calculator.currentOperand;
-            // Emit only when there was a real computation
+            const newVal = calculator.currentOperand;
             if (newVal !== prevVal && !isNaN(parseFloat(newVal))) {
                 emitHistoryEvent(`${action}(${prevVal})`, newVal);
             }
+            calculator.updateDisplay();
         }
-        calculator.updateDisplay();
     });
 });
 
 equalsButton.addEventListener('click', () => {
     const expr = buildHistoryExpression();
-    calculator.compute();
-    if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
-    calculator.updateDisplay();
-    haptic('success');
-    const announcer = document.getElementById('a11y-announcer');
-    if (announcer) announcer.textContent = `Resultado: ${calculator.currentOperand}`;
-    if (window.checkEasterEgg) checkEasterEgg(calculator.currentOperand);
+    const op   = calculator.operation;
+    const prev = parseFloat(calculator.previousOperand);
+    const cur  = parseFloat(calculator.currentOperand);
+
+    // Offload arithmetic to Worker if both operands are valid numbers (#34)
+    if (window.CalcWorker && !isNaN(prev) && !isNaN(cur) && op) {
+        CalcWorker.run({ type: 'compute', op, prev, current: cur })
+            .then(result => {
+                calculator.currentOperand = result;
+                calculator.operation = undefined;
+                calculator.previousOperand = '';
+                calculator.updateDisplay();
+                if (expr) emitHistoryEvent(expr, String(result));
+                haptic('success');
+                const announcer = document.getElementById('a11y-announcer');
+                if (announcer) announcer.textContent = `Resultado: ${result}`;
+                if (window.checkEasterEgg) checkEasterEgg(result);
+            })
+            .catch(err => {
+                if (err.message === 'DIV_ZERO') {
+                    if (window.showToast) showToast('No se puede dividir por cero', 'error');
+                    calculator.clear();
+                    calculator.updateDisplay();
+                } else {
+                    // Fallback to synchronous compute
+                    calculator.compute();
+                    if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
+                    calculator.updateDisplay();
+                }
+            });
+    } else {
+        // Sync path (no worker or missing operands)
+        calculator.compute();
+        if (expr) emitHistoryEvent(expr, String(calculator.currentOperand));
+        calculator.updateDisplay();
+        haptic('success');
+        const announcer = document.getElementById('a11y-announcer');
+        if (announcer) announcer.textContent = `Resultado: ${calculator.currentOperand}`;
+        if (window.checkEasterEgg) checkEasterEgg(calculator.currentOperand);
+    }
 });
+
 
 clearButton.addEventListener('click', () => {
     haptic('error');
