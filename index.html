@@ -22,13 +22,35 @@
     <meta property="twitter:image" content="https://tudominio.com/cover.png">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>">
-    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#38bdf8">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>">
+
     <title>Calculadora Premium | Glassmorphism</title>
     <!-- CSS Modules (#28) -->
     <link rel="stylesheet" href="css/themes.css?v=14">
     <link rel="stylesheet" href="css/style.css?v=14">
     <link rel="stylesheet" href="css/toast.css?v=14">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <script>
+    // Service Worker Registration (#37)
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => {
+                    reg.addEventListener('updatefound', () => {
+                        const newWorker = reg.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                if (window.showToast) showToast('Nueva versión disponible — recarga para actualizar 🔄', 'info');
+                            }
+                        });
+                    });
+                })
+                .catch(() => {});
+        });
+    }
+    </script>
     <style>
     /* ── Fix body overflow breaking position:fixed ── */
     body { overflow-x: visible; }
