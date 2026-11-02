@@ -2,7 +2,7 @@
   "name": "Calculadora Premium",
   "short_name": "Calc Premium",
   "description": "Calculadora JavaScript Premium con Glassmorphism, modo científico, gráficas y más.",
-  "start_url": "/index.html",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#0f172a",
   "theme_color": "#38bdf8",
@@ -15,6 +15,10 @@
       "purpose": "any maskable"
     }
   ],
-  "categories": ["utilities", "education"],
-  "lang": "es"
+  "categories": [
+    "utilities",
+    "education"
+  ],
+  "lang": "es",
+  "scope": "./"
 }

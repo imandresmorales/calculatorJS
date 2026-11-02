@@ -4,18 +4,24 @@
  * Provides full offline support after the first visit.
  */
 
-const CACHE_NAME = 'calc-premium-v14';
+// Cambia la versión en cada despliegue para que los usuarios reciban los archivos nuevos
+const CACHE_NAME = 'calc-premium-v16';
 
-/** All static assets to pre-cache on install */
+/** Archivos estáticos que se guardan al instalar (deben coincidir con index.html) */
 const PRECACHE_URLS = [
+    './',
     'index.html',
     'css/themes.css',
     'css/style.css',
     'css/toast.css',
+    'js/sw-register.js',
+    'js/db.js',
+    'js/worker-manager.js',
     'js/toast.js',
     'js/script.js',
     'js/matrices.js',
     'js/history.js',
+    'js/math-parser.js',
     'js/grapher.js',
     'js/programmer.js',
     'js/fractions.js',
@@ -35,6 +41,18 @@ const PRECACHE_URLS = [
     'js/gestures.js',
     'js/easter-eggs.js',
     'js/onboarding.js',
+    'js/clock.js',
+    'js/clipboard.js',
+    'js/memory.js',
+    'js/percentage.js',
+    'js/sparkline.js',
+    'js/exam-mode.js',
+    'js/pdf-export.js',
+    'js/geometry.js',
+    'js/ieee754.js',
+    'js/sci-notation.js',
+    'js/presentation.js',
+    'js/calc-worker.js',
     'manifest.json',
 ];
 
