@@ -20,64 +20,64 @@
     scratchClose.addEventListener('click', togglePanel);
     scratchBackdrop.addEventListener('click', togglePanel);
 
-    // Simple math evaluator with variables support
+    const VAR_NAME = /^[a-zA-Z_][a-zA-Z0-9_]*$/;
+
+    /** Crea la línea de resultado usando textContent (nunca innerHTML con datos del usuario). */
+    function createResultLine(text, isError) {
+        const line = document.createElement('div');
+        line.style.height = '1.5em';
+        line.style.lineHeight = '1.5';
+        line.style.whiteSpace = 'pre';
+        if (isError) {
+            const err = document.createElement('span');
+            err.style.color = '#ef4444';
+            err.style.fontSize = '0.8rem';
+            err.textContent = 'err';
+            line.appendChild(err);
+        } else {
+            line.textContent = text || ' ';
+        }
+        return line;
+    }
+
+    /**
+     * Evalúa cada línea del bloc de notas con soporte de variables (x = 5).
+     * Usa MathParser (js/math-parser.js), que no ejecuta código JavaScript.
+     */
     function evaluateScratchpad() {
-        const lines = input.value.split('\n');
-        let html = '';
-        let vars = {};
+        const vars = Object.create(null);
+        const fragment = document.createDocumentFragment();
 
-        lines.forEach(line => {
-            let res = '';
-            let val = line.trim();
-            
-            if (val) {
-                try {
-                    // Check for variable assignment: x = 5
-                    let isAssignment = false;
-                    let varName = '';
-                    if (val.includes('=')) {
-                        const parts = val.split('=');
-                        if (parts.length === 2) {
-                            varName = parts[0].trim();
-                            if (/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(varName)) {
-                                isAssignment = true;
-                                val = parts[1].trim();
-                            }
-                        }
-                    }
-
-                    // Replace variables in expression
-                    let expr = val;
-                    Object.keys(vars).forEach(k => {
-                        const regex = new RegExp(`\\b${k}\\b`, 'g');
-                        expr = expr.replace(regex, `(${vars[k]})`);
-                    });
-
-                    // Handle percentages: 100 + 20% -> 100 + (100 * 0.20)
-                    // Simplified: just replace 20% with *0.20 for now
-                    expr = expr.replace(/(\d+(?:\.\d+)?)%/g, '($1/100)');
-
-                    // Use Function to evaluate safely without eval
-                    const fn = new Function(`return ${expr}`);
-                    const result = fn();
-
-                    if (result !== undefined && !isNaN(result)) {
-                        res = result;
-                        if (isAssignment) {
-                            vars[varName] = result;
-                        }
-                    } else {
-                        res = '';
-                    }
-                } catch(e) {
-                    res = `<span style="color:#ef4444; font-size:0.8rem;">err</span>`;
-                }
+        input.value.split('\n').forEach(rawLine => {
+            const line = rawLine.trim();
+            if (!line) {
+                fragment.appendChild(createResultLine(''));
+                return;
             }
-            // Preserve line breaks exactly
-            html += `<div style="height: 1.5em; line-height: 1.5; white-space: pre;">${res !== '' ? res : ' '}</div>`;
+
+            try {
+                let expr = line;
+                let varName = null;
+
+                // Asignación de variable: nombre = expresión
+                const parts = line.split('=');
+                if (parts.length === 2 && VAR_NAME.test(parts[0].trim())) {
+                    varName = parts[0].trim();
+                    expr = parts[1];
+                }
+
+                const result = MathParser.compile(expr)(vars);
+                if (!Number.isFinite(result)) throw new RangeError('Resultado no finito');
+
+                const rounded = parseFloat(result.toPrecision(12));
+                if (varName) vars[varName] = rounded;
+                fragment.appendChild(createResultLine(String(rounded)));
+            } catch (_) {
+                fragment.appendChild(createResultLine('', true));
+            }
         });
 
-        output.innerHTML = html;
+        output.replaceChildren(fragment);
     }
 
     input.addEventListener('input', evaluateScratchpad);

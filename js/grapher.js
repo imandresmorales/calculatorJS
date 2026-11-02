@@ -126,39 +126,31 @@
         addDefaultRow();
     });
 
-    // ── Safe function evaluator ──────────────────────────────────────────────
+    /** Escapa texto del usuario antes de insertarlo en HTML. */
+    function escapeHtml(text) {
+        return String(text)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
+    // ── Evaluador seguro de funciones ───────────────────────────────────────
+    // Usa MathParser (js/math-parser.js): la expresión se analiza y evalúa
+    // sin ejecutar código JavaScript, a diferencia de eval o new Function.
     function buildFn(expr) {
         if (!expr || expr.trim() === '') return null;
-        // Translate common notation to JS
-        let e = expr
-            .replace(/\^/g, '**')
-            .replace(/(\d)(x)/g, '$1*x')
-            .replace(/(x)(\d)/g, 'x*$2')
-            .replace(/(\))(\()/g, ')*(')
-            .replace(/(\d)(\()/g, '$1*(')
-            .replace(/\bsin\b/g, 'Math.sin')
-            .replace(/\bcos\b/g, 'Math.cos')
-            .replace(/\btan\b/g, 'Math.tan')
-            .replace(/\basin\b/g, 'Math.asin')
-            .replace(/\bacos\b/g, 'Math.acos')
-            .replace(/\batan\b/g, 'Math.atan')
-            .replace(/\bsqrt\b/g, 'Math.sqrt')
-            .replace(/\babs\b/g,  'Math.abs')
-            .replace(/\blog\b/g,  'Math.log10')
-            .replace(/\bln\b/g,   'Math.log')
-            .replace(/\bexp\b/g,  'Math.exp')
-            .replace(/\bfloor\b/g,'Math.floor')
-            .replace(/\bceil\b/g, 'Math.ceil')
-            .replace(/\bround\b/g,'Math.round')
-            .replace(/\bPI\b/g,   'Math.PI')
-            .replace(/\bpi\b/g,   'Math.PI')
-            .replace(/\bPi\b/g,   'Math.PI')
-            .replace(/\be\b/g,    'Math.E');
         try {
-            // eslint-disable-next-line no-new-func
-            const fn = new Function('x', `"use strict"; try { return ${e}; } catch(e){ return NaN; }`);
-            // Quick test
-            fn(0);
+            const compiled = MathParser.compile(expr);
+            const fn = (x) => {
+                try {
+                    return compiled({ x });
+                } catch (_) {
+                    return NaN;
+                }
+            };
+            compiled({ x: 0 }); // Valida que solo use la variable x
             return fn;
         } catch (_) {
             return null;
@@ -433,7 +425,7 @@
             const roots   = findRoots(f, viewXMin, viewXMax);
             const extrema = findExtrema(f, viewXMin, viewXMax);
 
-            let html = `<div class="graph-fn-info-header" style="color:${fn.color}">f${i+1}(x) = ${fn.expr}</div>`;
+            let html = `<div class="graph-fn-info-header" style="color:${fn.color}">f${i+1}(x) = ${escapeHtml(fn.expr)}</div>`;
             if (roots.length) {
                 html += `<div class="graph-point-row">🎯 Raíces: ${roots.map(r => parseFloat(r.toFixed(4))).join(', ')}</div>`;
             }

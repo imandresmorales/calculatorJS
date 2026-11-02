@@ -1,5 +1,10 @@
 # 🧮 Calculadora Premium en JavaScript
 
+[![CI](https://github.com/imandresmorales/calculatorJS/actions/workflows/ci.yml/badge.svg)](https://github.com/imandresmorales/calculatorJS/actions/workflows/ci.yml)
+[![Deploy](https://github.com/imandresmorales/calculatorJS/actions/workflows/deploy-pages.yml/badge.svg)](https://github.com/imandresmorales/calculatorJS/actions/workflows/deploy-pages.yml)
+
+**[👉 Ver demo en vivo](https://imandresmorales.github.io/calculatorJS/)**
+
 Una aplicación de calculadora de alta gama desarrollada usando puramente **HTML, CSS (Vanilla) y JavaScript**. Presenta un increíble diseño "glassmorphism" oscuro con efectos de iluminación dinámicos y fondos estilo "Aurora Boreal".
 
 No es solo una calculadora estándar; es una suite completa con potentes herramientas matemáticas e interactivas integradas en una interfaz de usuario asombrosamente fluida.
@@ -110,6 +115,8 @@ No es solo una calculadora estándar; es una suite completa con potentes herrami
 ├── index.html               # Interfaz HTML y paneles emergentes
 ├── manifest.json            # PWA manifest (#37)
 ├── sw.js                    # Service Worker — soporte offline (#37)
+├── tests/                   # Pruebas del evaluador matemático (node --test)
+├── .github/workflows/       # CI y despliegue a GitHub Pages
 │
 ├── css/
 │   ├── themes.css           # Tokens de diseño: :root, light-theme, high-contrast (#28)
@@ -123,6 +130,7 @@ No es solo una calculadora estándar; es una suite completa con potentes herrami
     ├── toast.js             # Sistema de notificaciones emergentes (#30)
     ├── script.js            # Core de cálculo y lógica de DOM
     ├── history.js           # Historial con IndexedDB + localStorage fallback (#33)
+    ├── math-parser.js       # Evaluador de expresiones seguro (sin eval ni new Function)
     ├── grapher.js           # Motor gráfico en Canvas 2D
     ├── matrices.js          # Operaciones de álgebra lineal
     ├── programmer.js        # Modo programador (bases numéricas y bitwise)
@@ -142,7 +150,19 @@ No es solo una calculadora estándar; es una suite completa con potentes herrami
     ├── keyboard-sounds.js   # Sonidos de teclado mecánico (Web Audio API) (#27)
     ├── gestures.js          # Gestos táctiles para móviles (#31)
     ├── easter-eggs.js       # Animaciones de recompensa y easter eggs (#36)
-    └── onboarding.js        # Tour guiado para nuevos usuarios (#40)
+    ├── onboarding.js        # Tour guiado para nuevos usuarios (#40)
+    ├── sw-register.js       # Registro del Service Worker (#37)
+    ├── presentation.js      # Modo presentación (#39)
+    ├── clock.js             # Reloj y cronómetro (#41)
+    ├── clipboard.js         # Copiar resultado (#42)
+    ├── memory.js            # Memoria M+, M-, MR, MC (#43)
+    ├── percentage.js        # Porcentajes y propinas (#44)
+    ├── sparkline.js         # Mini gráfica de resultados recientes (#45)
+    ├── exam-mode.js         # Modo examen con PIN SHA-256 (#46)
+    ├── pdf-export.js        # Exportar historial a PDF (#47)
+    ├── geometry.js          # Áreas y volúmenes (#48)
+    ├── ieee754.js           # Visualizador IEEE 754 (#49)
+    └── sci-notation.js      # Notación científica STD/SCI (#50)
 ```
 
 ### Módulos CSS (Arquitectura Modular #28)
@@ -156,16 +176,18 @@ No es solo una calculadora estándar; es una suite completa con potentes herrami
 
 ## 🚀 Cómo Ejecutar
 
-**Opción 1 — Abrir directamente (recomendado):**
-```
-Haz doble clic en index.html
-```
-No requiere servidor. Funciona offline después de la primera visita gracias al Service Worker.
+**En línea:** abre la [demo en GitHub Pages](https://imandresmorales.github.io/calculatorJS/). Se puede instalar como app (PWA) y funciona sin conexión después de la primera visita.
 
-**Opción 2 — Servidor local (para Service Worker completo):**
+**En local:** sirve la carpeta con cualquier servidor estático (el Service Worker y la política de seguridad no funcionan abriendo el archivo directamente):
 ```bash
-npx http-server -p 8080 -c-1
-# Navega a http://127.0.0.1:8080
+python3 -m http.server 8080
+# o: npx http-server -p 8080 -c-1
+# Navega a http://localhost:8080
+```
+
+**Pruebas:**
+```bash
+node --test tests/*.test.js
 ```
 
 ---
@@ -189,7 +211,7 @@ npx http-server -p 8080 -c-1
 
 ---
 
-## 📋 Roadmap de Mejoras (40/40 Completadas)
+## 📋 Roadmap de Mejoras
 
 | # | Mejora | Estado |
 |---|--------|--------|
@@ -218,15 +240,26 @@ npx http-server -p 8080 -c-1
 | 38 | Bundling y Minificación | ⏳ Pendiente |
 | 39 | Modo Presentación (Pantalla Completa) | ✅ |
 | 40 | Onboarding y Recorrido Guiado | ✅ |
+| 41 | Reloj y Cronómetro | ✅ |
+| 42 | Copiar Resultado al Portapapeles | ✅ |
+| 43 | Memoria (M+, M-, MR, MC) | ✅ |
+| 44 | Porcentajes y Divisor de Propinas | ✅ |
+| 45 | Mini Gráfica de Resultados (Sparkline) | ✅ |
+| 46 | Modo Examen con PIN | ✅ |
+| 47 | Exportar Historial a PDF | ✅ |
+| 48 | Áreas y Volúmenes | ✅ |
+| 49 | Visualizador IEEE 754 | ✅ |
+| 50 | Notación Científica STD/SCI | ✅ |
 
 ---
 
 ## 🛡️ Seguridad
-- Todo el contenido de usuario se renderiza con `.textContent`, nunca `innerHTML` (prevención XSS).
-- Los eventos entre módulos usan `CustomEvent` con `String()` explícito para evitar ejecución de datos.
-- Las entradas a `localStorage` / IndexedDB pasan por validación de tipo y longitud máxima.
-- CSV export protegido contra CSV Injection (OWASP) con prefijo de neutralización.
-- El Service Worker solo cachea respuestas `status: 200` del mismo origen.
+- **Sin ejecución de código del usuario:** la calculadora gráfica y el bloc de notas usan `js/math-parser.js`, un evaluador propio (tokenizador + árbol sintáctico) en lugar de `eval()` o `new Function()`. Cubierto con pruebas, incluidos intentos de inyección.
+- **Content Security Policy:** solo se cargan scripts del propio sitio; no se permiten `eval` ni scripts en línea. Las conexiones externas se limitan a la API de monedas.
+- **Datos del usuario en el DOM con `textContent`:** el historial y el bloc de notas nunca insertan texto del usuario con `innerHTML`; donde se genera HTML con expresiones, se escapan.
+- **Importación de respaldos validada:** solo se aceptan las claves conocidas, con tipo, formato y tamaño máximo (colores hexadecimales, idiomas permitidos, archivo de 1 MB como máximo).
+- **CSV export** protegido contra CSV Injection (OWASP) con prefijo de neutralización.
+- El **Service Worker** solo cachea respuestas `status: 200` del mismo origen.
 
 ---
 

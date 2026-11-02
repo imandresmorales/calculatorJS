@@ -2,6 +2,9 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <!-- Política de seguridad de contenido: solo scripts propios, sin eval ni scripts en línea -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self' https://open.er-api.com; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Calculadora JavaScript Premium con interfaz Glassmorphism. Incluye funciones científicas, historial, matrices, fracciones, conversor de unidades y más.">
     <meta name="keywords" content="calculadora, javascript, matemáticas, glassmorphism, científica, matrices, fracciones">
@@ -9,17 +12,15 @@
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://tudominio.com/">
+    <meta property="og:url" content="https://imandresmorales.github.io/calculatorJS/">
     <meta property="og:title" content="Calculadora Premium JS">
     <meta property="og:description" content="Calculadora web avanzada con diseño Glassmorphism y herramientas premium.">
-    <meta property="og:image" content="https://tudominio.com/cover.png">
 
     <!-- Twitter -->
-    <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:url" content="https://tudominio.com/">
+    <meta property="twitter:card" content="summary">
+    <meta property="twitter:url" content="https://imandresmorales.github.io/calculatorJS/">
     <meta property="twitter:title" content="Calculadora Premium JS">
     <meta property="twitter:description" content="Calculadora web avanzada con diseño Glassmorphism y herramientas premium.">
-    <meta property="twitter:image" content="https://tudominio.com/cover.png">
 
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧮</text></svg>">
     <link rel="manifest" href="manifest.json">
@@ -32,25 +33,7 @@
     <link rel="stylesheet" href="css/style.css?v=14">
     <link rel="stylesheet" href="css/toast.css?v=14">
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
-    <script>
-    // Service Worker Registration (#37)
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-                .then(reg => {
-                    reg.addEventListener('updatefound', () => {
-                        const newWorker = reg.installing;
-                        newWorker.addEventListener('statechange', () => {
-                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                if (window.showToast) showToast('Nueva versión disponible — recarga para actualizar 🔄', 'info');
-                            }
-                        });
-                    });
-                })
-                .catch(() => {});
-        });
-    }
-    </script>
+    <script src="js/sw-register.js?v=16" defer></script>
     <style>
     /* ── Fix body overflow breaking position:fixed ── */
     body { overflow-x: visible; }
@@ -1121,7 +1104,8 @@
     <script src="js/script.js?v=14"></script>
     <script src="js/matrices.js?v=14"></script>
     <script src="js/history.js?v=14"></script>
-    <script src="js/grapher.js?v=14"></script>
+    <script src="js/math-parser.js?v=16"></script>
+    <script src="js/grapher.js?v=16"></script>
     <script src="js/programmer.js?v=14"></script>
     <script src="js/fractions.js?v=14"></script>
 
@@ -1134,9 +1118,9 @@
     <script src="js/tips.js?v=14"></script>
     <script src="js/random.js?v=14"></script>
     <script src="js/themes.js?v=14"></script>
-    <script src="js/scratchpad.js?v=14"></script>
+    <script src="js/scratchpad.js?v=16"></script>
     <script src="js/i18n.js?v=14"></script>
-    <script src="js/backup.js?v=14"></script>
+    <script src="js/backup.js?v=16"></script>
     <script src="js/keyboard-sounds.js?v=14"></script>
     <script src="js/gestures.js?v=14"></script>
     <script src="js/easter-eggs.js?v=14"></script>
@@ -1157,35 +1141,6 @@
     <!-- Presentation Mode Exit Button -->
     <button id="presentation-exit" aria-label="Salir del Modo Presentación">⛶ Salir Presentación</button>
 
-    <script>
-    // Presentation Mode (#39)
-    (function () {
-        const btn = document.getElementById('presentation-toggle');
-        const exitBtn = document.getElementById('presentation-exit');
-        if (!btn || !exitBtn) return;
-
-        function enterPresentation() {
-            document.body.classList.add('presentation-mode');
-            document.body.classList.remove('mini-mode');
-            if (window.showToast) showToast('Modo Presentación activo — Usa el teclado para operar', 'info');
-        }
-        function exitPresentation() {
-            document.body.classList.remove('presentation-mode');
-            if (window.showToast) showToast('Modo Presentación desactivado', 'info');
-        }
-
-        btn.addEventListener('click', () => {
-            document.body.classList.contains('presentation-mode') ? exitPresentation() : enterPresentation();
-        });
-        exitBtn.addEventListener('click', exitPresentation);
-
-        // ESC to exit
-        document.addEventListener('keydown', e => {
-            if (e.key === 'Escape' && document.body.classList.contains('presentation-mode')) {
-                exitPresentation();
-            }
-        });
-    })();
-    </script>
+    <script src="js/presentation.js?v=16"></script>
 </body>
 </html>
