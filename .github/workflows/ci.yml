@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: Pruebas y verificaciones
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Pruebas del evaluador matemático
+        run: node --test tests/*.test.js
+      - name: Sintaxis de todos los scripts
+        run: for f in js/*.js sw.js; do node --check "$f"; done
+      - name: Archivos del Service Worker existen
+        run: |
+          missing=0
+          for f in $(grep -oE "'(js|css)/[^']+'" sw.js | tr -d "'"); do
+            [ -f "$f" ] || { echo "Falta $f en el repositorio"; missing=1; }
+          done
+          exit $missing
+      - name: Sin eval ni new Function
+        run: |
+          if grep -nE "\beval\(|new Function\(" js/*.js sw.js; then
+            echo "No se permite eval/new Function (usar js/math-parser.js)"; exit 1
+          fi
