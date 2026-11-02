@@ -46,30 +46,80 @@
         }
     });
 
+    /* ── Validación del respaldo antes de importarlo ──────────────────────
+     * El archivo viene del usuario y podría estar manipulado: se aceptan solo
+     * las claves conocidas, con el tipo y formato esperados. */
+    const MAX_FILE_BYTES = 1024 * 1024; // 1 MB
+    const MAX_VALUE_LENGTH = 500 * 1024;
+    const LANGS = ['es', 'en', 'fr'];
+    const HEX_COLOR = /^#[0-9a-f]{6}$/i;
+
+    const parseJson = (text) => {
+        try { return JSON.parse(text); } catch (_) { return undefined; }
+    };
+
+    const isJsonArray = (text) => Array.isArray(parseJson(text));
+
+    const isValidTheme = (text) => {
+        const theme = parseJson(text);
+        if (!theme || typeof theme !== 'object') return false;
+        const opacity = Number(theme.opacity);
+        return HEX_COLOR.test(theme.color1) && HEX_COLOR.test(theme.color2) &&
+            Number.isFinite(opacity) && opacity >= 0 && opacity <= 100;
+    };
+
+    const VALIDATORS = {
+        calc_history: isJsonArray,
+        calc_favorites: isJsonArray,
+        calc_custom_theme: isValidTheme,
+        calc_lang: (value) => LANGS.includes(value),
+    };
+
+    /** Devuelve solo las entradas válidas, o null si el archivo no es un respaldo. */
+    function validateBackup(data) {
+        if (!data || typeof data !== 'object' || Array.isArray(data)) return null;
+        const valid = {};
+        for (const [key, isValid] of Object.entries(VALIDATORS)) {
+            const value = data[key];
+            if (value === null || value === undefined) continue;
+            if (typeof value !== 'string' || value.length > MAX_VALUE_LENGTH || !isValid(value)) return null;
+            valid[key] = value;
+        }
+        return Object.keys(valid).length > 0 ? valid : null;
+    }
+
+    function showResult(message, ok) {
+        const box = document.createElement('div');
+        box.style.cssText = `color:${ok ? '#34d399' : '#ef4444'}; text-align:center; padding:10px;`;
+        box.textContent = message;
+        results.replaceChildren(box);
+    }
+
     fileInput.addEventListener('change', (e) => {
         const file = e.target.files[0];
+        e.target.value = ''; // Permite volver a elegir el mismo archivo
         if (!file) return;
+
+        if (file.size > MAX_FILE_BYTES) {
+            showResult('El archivo es demasiado grande (máximo 1 MB).', false);
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = (ev) => {
-            try {
-                const data = JSON.parse(ev.target.result);
-                
-                if (data.calc_history) localStorage.setItem('calc_history', data.calc_history);
-                if (data.calc_favorites) localStorage.setItem('calc_favorites', data.calc_favorites);
-                if (data.calc_custom_theme) localStorage.setItem('calc_custom_theme', data.calc_custom_theme);
-                if (data.calc_lang) localStorage.setItem('calc_lang', data.calc_lang);
-                
-                results.innerHTML = `<div style="color:#34d399; text-align:center; padding:10px;">Importación exitosa. Recarga la página.</div>`;
-                
-                // Force reload to apply theme and lang immediately
-                setTimeout(() => {
-                    window.location.reload();
-                }, 1500);
-            } catch(err) {
-                results.innerHTML = `<div style="color:#ef4444; text-align:center; padding:10px;">Archivo inválido o corrupto.</div>`;
+            const backup = validateBackup(parseJson(ev.target.result));
+            if (!backup) {
+                showResult('Archivo inválido o corrupto.', false);
+                return;
             }
+
+            Object.entries(backup).forEach(([key, value]) => localStorage.setItem(key, value));
+            showResult('Importación exitosa. Recargando…', true);
+
+            // Recarga para aplicar tema e idioma
+            setTimeout(() => window.location.reload(), 1500);
         };
+        reader.onerror = () => showResult('No se pudo leer el archivo.', false);
         reader.readAsText(file);
     });
 })();
